@@ -1,0 +1,156 @@
+/* perfil_admin.css */
+
+/* Contenedor principal */
+.perfil-container {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+    font-family: 'Arial', sans-serif;
+    color: #333;
+}
+
+/* Contenedor de la foto */
+.profile-photo-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile-photo {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #4CAF50;
+    transition: all 0.3s ease;
+}
+
+.profile-photo:hover {
+    opacity: 0.8;
+    cursor: pointer;
+}
+
+/* Botón para cambiar foto */
+.change-photo-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.change-photo-btn:hover {
+    background-color: #45a049;
+}
+
+/* Tarjetas */
+.card {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.card-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #4CAF50;
+}
+
+/* Información personal */
+.profile-info p {
+    font-size: 16px;
+    margin: 6px 0;
+}
+
+/* Puntos grandes */
+.points-card {
+    text-align: center;
+    background: #e8f5e9;
+    padding: 25px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.points-card h2 {
+    font-size: 22px;
+    margin-bottom: 10px;
+    color: #4CAF50;
+}
+
+.big-points {
+    font-size: 40px;
+    font-weight: bold;
+    color: #388E3C;
+}
+
+/* Tabla moderna */
+.table-container {
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+.table-modern {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+}
+
+.table-modern th,
+.table-modern td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+}
+
+.table-modern th {
+    background-color: #f2f2f2;
+    font-weight: 600;
+}
+
+.table-modern tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+/* Botones de acción */
+.btn-group {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.btn-action {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.btn-action:hover {
+    background-color: #45a049;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .profile-photo {
+        width: 120px;
+        height: 120px;
+    }
+
+    .big-points {
+        font-size: 32px;
+    }
+
+    .card {
+        padding: 20px;
+    }
+}

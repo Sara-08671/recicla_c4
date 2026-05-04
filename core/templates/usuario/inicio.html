@@ -1,0 +1,31 @@
+{% extends "usuario/base.html" %}
+{% load static %}
+{% block titulo %}Recicla Comuna 4{% endblock %}
+
+{% block cabeza_extra %}
+ <link rel="stylesheet" href="{% static 'usuario/css/estilos.css' %}">
+ <link rel="stylesheet" href="{% static 'usuario/css/inicio.css' %}">
+{% endblock %}
+
+{% block cuerpo %}
+{% include 'usuario/header.html' %}
+
+
+<main class="page-container" id="mainContent">
+<!-- Hero -->
+<section class="hero" id="inicio" role="region" aria-label="Hero">
+  <div>
+      <h1>Transforma tu barrio con el reciclaje comunitario</h1>
+      <p>Únete a nuestra plataforma para organizar y participar en jornadas de reciclaje en la Comuna 4. Juntos podemos crear un entorno más limpio y sostenible.</p>
+      <div class="cta-buttons">
+          <a href="{% url 'usuario_como_participar' %}" class="btn-join" style="text-decoration: none;background:transparent;color:white;border:2px solid rgba(255,255,255,0.85);border-radius: 40px;padding: 4px;">Cómo participar</a>
+      </div>
+  </div>
+</section>
+</main>
+<!--#endregion contenido-->
+
+{% include 'usuario/footer.html' %}
+
+
+{% endblock %}

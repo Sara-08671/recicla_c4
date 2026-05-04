@@ -1,0 +1,211 @@
+.title {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 20px;
+}
+
+.top-actions {
+    text-align: right;
+    margin-bottom: 20px;
+}
+
+.btn-add {
+    background: var(--primary);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 10px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.table-container {
+    overflow-x: auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.users-table th {
+    background: var(--primary);
+    color: white;
+    padding: 12px;
+}
+
+.users-table td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.btn-edit, .btn-delete {
+    padding: 6px 10px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: white;
+    margin-right: 6px;
+    font-size: 14px;
+}
+
+.btn-edit {
+    background: #f1c40f;
+}
+
+.btn-delete {
+    background: #e74c3c;
+}
+
+.no-data {
+    text-align: center;
+    padding: 20px;
+    font-weight: 600;
+}
+
+.form-card {
+    background: #fff;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    max-width: 500px;
+    margin: auto;
+}
+
+.form-card label {
+    margin-top: 10px;
+    font-weight: 600;
+}
+
+.form-card input,
+.form-card select {
+    width: 100%;
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    margin-top: 5px;
+}
+
+.btn-save {
+    margin-top: 20px;
+    width: 100%;
+    background: var(--primary);
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+}
+/* static/administrador/css/usuarios.css */
+.page-container { max-width:1100px; margin:92px auto 60px; padding:20px; }
+.controls { display:flex; gap:10px; align-items:center; margin-bottom:18px; }
+.controls input, .controls select { padding:8px; border-radius:8px; border:1px solid #ccc; }
+.table { width:100%; border-collapse: collapse; }
+.table th, .table td { padding:10px; border-bottom:1px solid #eee; text-align:left; }
+.btn { background:var(--primary); color:#fff; padding:8px 12px; border-radius:8px; text-decoration:none; }
+.pagination { margin-top:14px; }
+
+/* Contenedor del formulario */
+.form-inline {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+    align-items: center;
+}
+
+/* Input de búsqueda */
+.form-inline input[type="text"] {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    flex: 1; /* ocupa todo el ancho disponible */
+    transition: 0.3s;
+}
+
+.form-inline input[type="text"]:focus {
+    outline: none;
+    border-color: #27ae60;
+    box-shadow: 0 0 5px rgba(39, 174, 96, 0.5);
+}
+
+/* Select de estado */
+.form-inline select {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    transition: 0.3s;
+}
+
+.form-inline select:focus {
+    outline: none;
+    border-color: #27ae60;
+    box-shadow: 0 0 5px rgba(39, 174, 96, 0.5);
+}
+
+/* Botón filtrar */
+.form-inline button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    background-color: #27ae60;
+    color: #fff;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.form-inline button:hover {
+    background-color: #219150;
+}
+/* Contenedor de paginación */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 15px;
+    gap: 8px;
+    font-family: Arial, sans-serif;
+}
+
+/* Estilos de los enlaces */
+.pagination a {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    text-decoration: none;
+    color: #27ae60;
+    transition: 0.3s;
+}
+
+.pagination a:hover {
+    background-color: #27ae60;
+    color: #fff;
+}
+
+/* Página actual */
+.pagination span {
+    padding: 6px 12px;
+    border-radius: 6px;
+    background-color: #27ae60;
+    color: #fff;
+    font-weight: bold;
+}
+/* Botón Ver Puntaje */
+.btn-view {
+    background: #2980b9;        /* azul profesional */
+    color: white;
+    padding: 6px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 14px;
+    display: inline-block;
+    transition: 0.3s ease;
+}
+
+.btn-view:hover {
+    background: #1f6390;        /* azul más oscuro */
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+}

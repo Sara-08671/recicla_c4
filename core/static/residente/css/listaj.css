@@ -1,0 +1,84 @@
+/* ======== CONTENEDOR GENERAL ======== */
+.page-container {
+    padding: 30px;
+    max-width: 1100px;
+    margin: 0 auto;
+    font-family: 'Poppins', sans-serif;
+    margin-top: 100px;
+}
+
+/* ======== TÍTULO ======== */
+.page-container h1 {
+    text-align: center;
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: #2c7a4b;
+    margin-bottom: 30px;
+}
+
+/* ======== LISTA ======== */
+.lista-jornadas {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* ======== ITEM DE JORNADA ======== */
+.jornada-item {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-left: 8px solid #36a571;
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.jornada-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+/* ======== TITULO DE LA JORNADA ======== */
+.jornada-item h2 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #1b5e3a;
+    margin-bottom: 12px;
+}
+
+/* ======== PÁRRAFOS ======== */
+.jornada-item p {
+    margin: 6px 0;
+    font-size: 1rem;
+    color: #333;
+}
+
+/* ======== BOTÓN VER DETALLES ======== */
+.btn-ver {
+    display: inline-block;
+    padding: 10px 18px;
+    background: #2f855a;
+    color: #fff;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    margin-top: 12px;
+    transition: background .2s ease, transform .2s ease;
+}
+
+.btn-ver:hover {
+    background: #276749;
+    transform: scale(1.03);
+}
+
+/* ======== RESPONSIVE ======== */
+@media (max-width: 768px) {
+    .jornada-item {
+        padding: 20px;
+    }
+
+    .jornada-item h2 {
+        font-size: 1.4rem;
+    }
+}

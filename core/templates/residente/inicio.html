@@ -1,0 +1,31 @@
+{% extends "residente/base.html" %}
+{% load static %}
+{% block titulo %}Recicla Comuna 4{% endblock %}
+
+{% block cabeza_extra %}
+ <link rel="stylesheet" href="{% static 'residente/css/estilos_residentes.css' %}">
+ <link rel="stylesheet" href="{% static 'residente/css/inicio.css' %}">
+{% endblock %}
+
+{% block cuerpo %}
+{% include 'residente/header.html' %}
+
+<!--#region contenido-->
+<!-- Main content -->
+<main class="page-container" id="mainContent">
+<!-- Hero -->
+<section class="hero" id="inicio" role="region" aria-label="Hero">
+  <div>
+      <h1>Bienvenido, {{ request.session.usuario_nombre }} ({{ request.session.usuario_rol|capfirst }})</h1>
+      <p>Gracias por unirte a nuestra plataforma para organizar y participar en jornadas de reciclaje en la Comuna 4. Juntos podemos crear un entorno más limpio y sostenible.</p>
+      <div class="cta-buttons">
+          <a href="{% url 'residente_como_participar' %}" class="btn-join" style="text-decoration: none;background:transparent;color:white;border:2px solid rgba(255,255,255,0.85);border-radius: 40px;padding: 4px;">Cómo participar</a>
+      </div>
+  </div>
+</section>
+</main>
+<!--#endregion contenido-->
+
+{% include 'residente/footer.html' %}
+
+{% endblock %}

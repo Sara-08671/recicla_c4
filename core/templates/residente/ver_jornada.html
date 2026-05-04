@@ -1,0 +1,39 @@
+{% extends "residente/base.html" %}
+{% load static %}
+{% block titulo %}Detalles de la Jornada{% endblock %}
+
+{% block cabeza_extra %}
+<link rel="stylesheet" href="{% static 'residente/css/estilos_residentes.css' %}">
+<link rel="stylesheet" href="{% static 'residente/css/ver_jornada.css' %}">
+
+{% endblock %}
+{% block cuerpo %}
+
+{% include "residente/header.html" %}
+
+<main class="page-container">
+
+<div class="wrapper">
+    <h1 class="titulo">📋 Detalles de la Jornada</h1>
+
+    <div class="card jornada-card">
+        <h2 class="card-title">{{ jornada.titulo }}</h2>
+        <p class="card-text"><strong>📝 Descripción:</strong> {{ jornada.descripcion }}</p>
+        <p class="card-text"><strong>📅 Fecha:</strong> {{ jornada.fecha }}</p>
+        <p class="card-text"><strong>⏰ Hora:</strong> {{ jornada.hora }}</p>
+        <p class="card-text"><strong>🏘 Barrio:</strong> {{ jornada.barrio }}</p>
+        <p class="card-text"><strong>📍 Dirección:</strong> {{ jornada.direccion }}</p>
+        <p class="card-text"><strong>♻ Tipo de material:</strong> {{ jornada.tipo_material }}</p>
+        <p class="card-text"><strong>👥 Cupo máximo:</strong> {{ jornada.cupo_maximo }}</p>
+        <p class="card-text"><strong>📊 Estado:</strong> {{ jornada.get_estado_display }}</p>
+
+         {% if jornada.estado == "activa" %}
+             <a href="{% url 'residente_inscripcion' jornada.id_jornada %}" class="btn-inscribirse">Inscribirse</a>
+        {% endif %}
+    </div>
+</div>
+
+</main>
+
+{% include "residente/footer.html" %}
+{% endblock %}

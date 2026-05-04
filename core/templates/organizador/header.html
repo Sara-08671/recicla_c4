@@ -1,0 +1,83 @@
+{% extends "organizador/base.html" %}
+
+{% block cuerpo %}
+<header>
+  <div class="header-left">
+    <button class="hamburger" id="openSidebar" aria-label="Abrir menú">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" fill="black">
+        <path d="M3 6h18v2H3V6zm0 5h18v2H3v-2zm0 5h18v2H3v-2z"/>
+      </svg>
+    </button>
+
+    <div class="logo">
+      <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(90deg,var(--primary),var(--secondary));display:grid;place-items:center;color:white;font-weight:800">♻</div>
+      <div>
+        <div style="font-size:16px">Recicla <span>Comuna 4</span></div>
+        <div style="font-size:11px;color:rgba(0,0,0,0.5)">Jornadas & Comunidad</div>
+      </div>
+    </div>
+  </div>
+
+  <nav class="header-right">
+    <ul>
+      <li><a href="{% url 'organizador_inicio' %}">🏠 Inicio</a></li>
+      <li><a href="{% url 'organizador_educacion' %}">🌟 Educación</a></li>
+
+      <li class="submenu-parent">
+        <a href="javascript:void(0);" class="submenu-toggle">
+          💬 Foro <i class="fas fa-chevron-down"></i>
+        </a>
+        <ul class="submenu">
+          <li><a href="{% url 'organizador_publicacion_foro' %}">Nueva Publicación</a></li>
+          <li><a href="{% url 'organizador_foro_publicaciones' %}">Publicaciones</a></li>
+        </ul>
+      </li>
+
+      <li><a href="{% url 'organizador_contacto' %}">✉️ Contacto</a></li>
+
+      <li><a href="{% url 'perfil_organizador' %}" class="btn-profile">Perfil <i class="fas fa-user-circle"></i></a></li>
+    </ul>
+  </nav>
+</header>
+
+{% if messages %}
+<div class="messages">
+    {% for message in messages %}
+        <div class="alert {{ message.tags }}">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Overlay -->
+<div id="overlay" aria-hidden="true"></div>
+
+<!-- Menú Lateral -->
+<aside class="sidebar" id="sidebar" aria-hidden="true" role="navigation">
+  <div class="close">
+      <button id="closeSidebar" aria-label="Cerrar menú" class="btn-close">
+
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <ul>
+    <li class="submenu-parent">
+      <a href="#" class="submenu-toggle" id="toggle-jornadas">📅 Jornadas <i class="fas fa-chevron-down"></i></a>
+      <ul class="submenu">
+        <li><a href="{% url 'organizador_creacion_jornadas' %}">📝 Formulario de Jornada</a></li>
+        <li><a href="{% url 'organizador_asistencia' %}">📝 Registro de asistencia</a></li>
+        <li><a href="{% url 'organizador_recoleccion' %}">📝 Registro de recolección</a></li>
+      </ul>
+    </li>
+
+    <li><a href="{% url 'organizador_recompensa' %}">🎁 Recompensas</a></li>
+    <li><a href="{% url 'organizador_notificaciones' %}">🔔 Notificaciones</a></li>
+    <li><a href="{% url 'organizador_configuracion' %}">⚙️ Configuración</a></li>
+  </ul>
+
+  <a href="{% url 'logout' %}">Cerrar sesión</a>
+</aside>
+
+{% endblock %}

@@ -1,0 +1,446 @@
+/* ======================================
+   RESET Y VARIABLES
+====================================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+
+  --primary: #81c784;
+  --secondary: #27AE60;
+}
+
+/* ======================================
+   BASE
+====================================== */
+body {
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  background: white;
+  display: flex;
+  flex-direction: column;   /* columna para footer */
+  justify-content: flex-start;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+/* ======================================
+   LAYOUT PRINCIPAL
+====================================== */
+main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  width: 100%;
+  max-width: 1200px;
+  padding: 20px;
+  margin-top: 120px; /* espacio para menú superior */
+  transition: margin-left 0.28s ease;
+}
+
+.wrapper {
+  display: flex;
+  flex: 1;
+  gap: 30px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.15);
+  padding: 30px;
+  margin: auto;
+  width: 100%;
+  max-width: 1200px;
+}
+
+/* Panel izquierdo */
+.left-panel {
+  flex: 1;
+  padding: 20px;
+  color: var(--dark);
+}
+.titulo {
+  background: linear-gradient(90deg, #66bb6a, #2e7d32);
+  color: white;
+  padding: 20px 30px;
+  border-radius: 15px;
+  font-size: 30px;
+  font-weight: bold;
+  box-shadow: 0px 6px 15px rgba(0,0,0,0.2);
+  margin-bottom: 20px;
+  text-align: center;
+  letter-spacing: 1px;
+}
+.descripcion {
+  font-size: 18px;
+  line-height: 1.8;
+  color: #2f4f4f;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 25px;
+  border-left: 6px solid #388e3c;
+  border-radius: 12px;
+  box-shadow: 0px 6px 15px rgba(0,0,0,0.1);
+}
+.descripcion strong {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+/* ======================================
+   FORMULARIO
+====================================== */
+.form-container {
+  flex: 1;
+  background: white;
+  padding: 40px 35px;
+  border-radius: 15px;
+  box-shadow: 0px 10px 25px rgba(0,0,0,0.15);
+  max-height: 80vh;
+  overflow-y: auto;
+}
+.form-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  color: #2e7d32;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+form .campo.full { grid-column: span 2; }
+
+.campo { margin-bottom: 20px; }
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--dark);
+}
+input[type="text"],
+input[type="date"],
+input[type="time"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #c8e6c9;
+  border-radius: 10px;
+  font-size: 16px;
+  background-color: #f9fff9;
+  transition: all 0.3s ease;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: #388e3c;
+  outline: none;
+  box-shadow: 0px 0px 10px rgba(56,142,60,0.4);
+}
+textarea { min-height: 100px; resize: vertical; }
+
+button {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(90deg, #66bb6a, #388e3c);
+  border: none;
+  color: white;
+  font-size: 18px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+button:hover {
+  background: linear-gradient(90deg, #388e3c, #1b5e20);
+  transform: scale(1.05);
+  box-shadow: 0px 6px 15px rgba(0,0,0,0.2);
+}
+.btn-profile {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: #2ECC71 !important;
+    color: white !important;
+    padding: 6px 14px;
+    border-radius: 9999px!important;  
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: transform 0.18s ease, background 0.18s ease;
+}
+
+.btn-profile:hover {
+    transform: translateY(-2px);
+    background: #2ECC71;  /* mismo color SIN cambiar */
+    color: white !important;
+}
+
+/* ======================================
+   MENÚ SUPERIOR
+====================================== */
+.menu-superior {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  z-index: 1200;
+}
+
+.menu-superior .logo {
+  display:flex; align-items:center; gap:10px;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: var(--dark);
+  transition: transform 0.3s ease;
+}
+.menu-superior .logo span { color: var(--primary); }
+.menu-superior .logo:hover { transform: scale(1.05); }
+
+.menu-superior nav ul {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+}
+.menu-superior nav ul li a {
+  color: #000;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 8px 15px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+.menu-lateral ul li a:hover {
+  background: none;
+  color: #1b4332;
+  transform: none;
+}
+
+.menu-superior nav ul li a::after {
+  content: "";
+  position: absolute;
+  bottom: -4px; left: 0;
+  width: 0%; height: 2px;
+  background-color: var(--primary);
+  transition: width 0.3s ease;
+}
+.menu-superior nav ul li a:hover::after { width: 100%; }
+
+/* contenedor con submenú → necesario para el posicionamiento */
+.menu-superior nav ul li.has-submenu {
+  position: relative;
+}
+
+/* ocultar submenú por defecto */
+.menu-superior nav ul li .submenu {
+  display: none;
+  position: absolute;
+  top: 100%;   /* aparece debajo del padre */
+  left: 0;
+  background: white;
+  padding: 10px 0;
+  list-style: none;
+  margin: 0;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  min-width: 180px;
+  z-index: 2000;
+}
+
+/* mostrar en hover */
+.menu-superior nav ul li.has-submenu:hover .submenu {
+  display: block;
+}
+
+/* estilos de enlaces dentro del submenú */
+.menu-superior nav ul li .submenu li a {
+  display: block;
+  padding: 8px 15px;
+  color: #333;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.menu-superior nav ul li .submenu li a:hover {
+  background: rgba(0,0,0,0.05);
+  font-weight: 600;
+}
+
+
+/* Hamburguesa */
+.menu-superior .header-left {
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.hamburger {
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: inherit !important;
+}
+.hamburger svg { width: 32px; height: 32px; }
+.hamburger svg path { fill: #000 !important; }
+.hamburger:hover svg path { fill: #000 !important; }
+
+/* ======================================
+   MENÚ LATERAL
+====================================== */
+.menu-lateral {
+  position: fixed;
+  top: 72px; left: -260px;
+  width: 230px; height: 100%;
+  background: white;
+  padding-top: 20px;
+  border-right: 3px solid var(--primary);
+  box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+  border-radius: 0 15px 15px 0;
+  overflow-y: auto;
+  transition: left 0.28s ease;
+  z-index: 998;
+}
+
+.menu-lateral button {
+  display: none !important;
+}
+
+.menu-lateral.activo { left: 0; }
+.menu-lateral ul { list-style: none; padding: 0; }
+.menu-lateral ul li { margin: 10px 0; }
+.menu-lateral ul li a {
+  text-decoration: none;
+  color: #2f4f4f;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+.menu-lateral ul li a:hover {
+  background: linear-gradient(90deg,#66bb6a,#388e3c);
+  color: white;
+  transform: translateX(5px);
+}
+.menu-lateral ul li a.active {
+  background: #388e3c;
+  color: white;
+  font-weight: 700;
+}
+
+/* Submenú lateral */
+.menu-lateral ul li ul.submenu {
+  display: none;
+  list-style: none;
+  padding-left: 10px;
+  margin-top: 5px;
+  border-left: 3px solid #66bb6a;
+  background: rgba(200,230,201,0.5);
+}
+.menu-lateral ul li ul.submenu.activo { display: block; }
+.menu-lateral ul li ul.submenu li a {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #2e7d32;
+}
+.menu-lateral ul li ul.submenu li a:hover {
+  background-color: #a8e6cf;
+  color: #1b4332;
+  font-weight: 600;
+}
+.has-submenu > a::after {
+  content: " ▼";
+  font-size: 12px;
+  margin-left: auto;
+  transition: transform 0.3s ease;
+}
+.has-submenu.open > a::after { transform: rotate(180deg); }
+
+/* Scroll */
+.menu-lateral::-webkit-scrollbar { width: 6px; }
+.menu-lateral::-webkit-scrollbar-thumb {
+  background: var(--primary); border-radius: 3px;
+}
+.menu-lateral::-webkit-scrollbar-track { background: #e9f7ef; }
+
+/* Overlay */
+#overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+  z-index: 995;
+}
+body.sidebar-open #overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+body.sidebar-open main { margin-left: 240px; }
+
+/* ======================================
+   FOOTER
+====================================== */
+footer {
+  width: 100%;
+  background: var(--dark);
+  color: white;
+  padding: 40px 20px;
+  text-align: center;
+  margin-top: auto;
+}
+.footer-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fit,minmax(200px,1fr));
+  gap:20px;
+  margin-bottom:18px;
+}
+.footer-col h4 { font-size:1.1rem; margin-bottom:12px; color:white; }
+.footer-col a {
+  color:#ddd; text-decoration:none;
+  display:block; margin-bottom:8px;
+  transition: color 0.2s;
+}
+.footer-col a:hover { color: var(--primary); }
+.social-links {
+  display:flex; justify-content:center;
+  gap:12px; margin-top:12px;
+}
+.social-links a { color:white; font-size:18px; transition: color 0.2s; }
+.social-links a:hover { color: var(--primary); }
+
+/* ======================================
+   RESPONSIVO
+====================================== */
+@media (max-width: 900px) {
+  main {
+    flex-direction: column;
+    text-align: center;
+    margin-left: 0;
+  }
+  .left-panel { order: 2; }
+  .form-container { order: 1; width: 100%; }
+  .wrapper { flex-direction: column; padding: 20px; }
+  .menu-superior nav { display: none; }
+}

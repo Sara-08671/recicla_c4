@@ -1,0 +1,111 @@
+<!-- core/templates/administrador/usuarios_list.html -->
+{% extends "administrador/base.html" %}
+{% load static %}
+{% block cuerpo %}
+<link rel="stylesheet" href="{% static 'administrador/css/estilos.css' %}">
+<link rel="stylesheet" href="{% static 'administrador/css/usuarios.css' %}">
+{% include 'administrador/header.html' %}
+<div class="page-container">
+  <h1>Usuarios</h1>
+
+  <div class="controls">
+    <input id="searchBox" placeholder="Buscar por nombre, apellido o correo..." />
+    <select id="filterRol">
+      <option value="">Todos los roles</option>
+      <option value="residente">Residente</option>
+      <option value="organizador">Organizador</option>
+      <option value="administrador">Administrador</option>
+    </select>
+    <select id="filterEstado">
+      <option value="">Todos los estados</option>
+      <option value="activo">Activo</option>
+      <option value="pendiente">Pendiente</option>
+      <option value="aprobado">Aprobado</option>
+      <option value="rechazado">Rechazado</option>
+      <option value="suspendido">Suspendido</option>
+    </select>
+    <a class="btn" href="{% url 'admin_users_create' %}">➕ Nuevo usuario</a>
+    <a class="btn" href="{% url 'admin_users_export_xlsx' %}">Exportar .xlsx</a>
+    <a class="btn" href="{% url 'admin_users_export_pdf' %}">Exportar PDF</a>
+  </div>
+
+  <table class="table">
+    <thead>
+      <tr>
+        <th>ID</th><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="usersTable">
+      {% for u in users %}
+      <tr>
+        <td>{{ u.id_usuario }}</td>
+        <td>{{ u.nombre }} {{ u.apellido }}</td>
+        <td>{{ u.correo }}</td>
+        <td>{{ u.rol }}</td>
+        <td>{{ u.estado }}</td>
+        <td>
+          <a href="{% url 'admin_users_edit' u.id_usuario %}">Editar</a> |
+          {% if u.estado != "suspendido" %}
+            <a href="{% url 'admin_users_suspend' u.id_usuario %}">Suspender</a>
+          {% else %}
+            <a href="{% url 'admin_users_restore' u.id_usuario %}">Restaurar</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="6">No hay usuarios.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="pagination">
+    {% if page_obj.has_previous %}
+      <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+    {% endif %}
+    <span>Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}">Siguiente</a>
+    {% endif %}
+  </div>
+</div>
+
+{% include 'administrador/footer.html' %}
+<script>
+  // búsqueda en tiempo real (fetch a la API)
+  const searchBox = document.getElementById('searchBox');
+  const rolSel = document.getElementById('filterRol');
+  const estadoSel = document.getElementById('filterEstado');
+  const usersTable = document.getElementById('usersTable');
+
+  function fetchUsers() {
+    const q = encodeURIComponent(searchBox.value);
+    const rol = rolSel.value;
+    const estado = estadoSel.value;
+    fetch("{% url 'admin_users_api_search' %}?q="+q+"&rol="+rol+"&estado="+estado)
+      .then(r=>r.json()).then(data=>{
+        usersTable.innerHTML = "";
+        if (!data.results.length) {
+          usersTable.innerHTML = `<tr><td colspan="6">No hay resultados</td></tr>`;
+          return;
+        }
+        data.results.forEach(u=>{
+          const acciones = u.estado !== 'suspendido'
+            ? `<a href="/admin/usuarios/${u.id}/edit/">Editar</a> | <a href="/admin/usuarios/${u.id}/suspend/">Suspender</a>`
+            : `<a href="/admin/usuarios/${u.id}/edit/">Editar</a> | <a href="/admin/usuarios/${u.id}/restore/">Restaurar</a>`;
+          usersTable.insertAdjacentHTML('beforeend', `<tr>
+            <td>${u.id}</td>
+            <td>${u.nombre}</td>
+            <td>${u.correo}</td>
+            <td>${u.rol}</td>
+            <td>${u.estado}</td>
+            <td>${acciones}</td>
+          </tr>`);
+        });
+      });
+  }
+
+  searchBox.addEventListener('input', () => fetchUsers());
+  rolSel.addEventListener('change', () => fetchUsers());
+  estadoSel.addEventListener('change', () => fetchUsers());
+</script>
+{% endblock %}

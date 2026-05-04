@@ -1,0 +1,11 @@
+{% extends "administrador/base.html" %}
+{% block cuerpo %}
+<h2>🗑️ Eliminar Jornada: {{ jornada.titulo }}</h2>
+<p>¿Seguro que deseas eliminar esta jornada?</p>
+
+<form method="POST">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-eliminar">Sí, eliminar</button>
+    <a href="{% url 'lista_jornadas' %}" class="btn">Cancelar</a>
+</form>
+{% endblock %}

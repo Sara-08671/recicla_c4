@@ -1,0 +1,107 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>{% block titulo %}{% endblock %}</title>
+    {% block cabeza_extra %}{% endblock %}
+</head>
+<body>
+    {% block cuerpo %}
+    {% endblock %}
+
+     <script>
+ const openSidebarBtn = document.getElementById('openSidebar');
+ const closeSidebarBtn = document.getElementById('closeSidebar');
+ const sidebar = document.getElementById('sidebar');
+ const mainContent = document.getElementById('mainContent');
+
+ function openSidebar() {
+     sidebar.classList.add('active');
+     mainContent.style.transform = 'translateX(260px)';
+ }
+ function closeSidebar() {
+     sidebar.classList.remove('active');
+     mainContent.style.transform = 'translateX(0)';
+ }
+
+ openSidebarBtn.addEventListener('click', () => {
+     if(sidebar.classList.contains('active')) closeSidebar();
+     else openSidebar();
+ });
+
+ if(closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+
+ // Submenú toggle
+ document.querySelectorAll('.submenu-toggle').forEach(toggle => {
+     toggle.addEventListener('click', (e) => {
+         e.preventDefault();           // Evita que siga el enlace
+         e.stopPropagation();          // Evita que el clic cierre el sidebar
+         toggle.parentElement.classList.toggle('active');
+     });
+ });
+
+ // Enlaces normales cierran el sidebar
+ sidebar.querySelectorAll('a').forEach(a => {
+     if(!a.classList.contains('submenu-toggle')) {
+         a.addEventListener('click', closeSidebar);
+     }
+ });
+
+ // Close on Escape
+ document.addEventListener('keydown', (e) => {
+     if(e.key === 'Escape' && sidebar.classList.contains('active')) closeSidebar();
+ });
+
+ document.querySelectorAll('.submenu-toggle').forEach(toggle => {
+   const parent = toggle.parentElement; // li.submenu-parent
+   const submenu = parent.querySelector('.submenu');
+
+   toggle.addEventListener('click', (e) => {
+     e.preventDefault();
+     e.stopPropagation(); // evita que el clic cierre otro menú
+     submenu.classList.toggle('active'); // solo alterna la visibilidad de este submenú
+   });
+ });
+
+ // Cerrar submenús si se hace clic fuera
+ document.addEventListener('click', (e) => {
+   document.querySelectorAll('.submenu.active').forEach(sm => {
+     if (!sm.parentElement.contains(e.target)) {
+       sm.classList.remove('active');
+     }
+   });
+ });
+
+ // Dark Mode functionality
+ document.addEventListener('DOMContentLoaded', () => {
+   const darkModeToggle = document.getElementById('darkModeToggle');
+   const rootElement = document.documentElement; // <html> element
+
+   // Check for saved user preference, if any, on load
+   const savedMode = localStorage.getItem('darkMode');
+   if (savedMode === 'enabled') {
+     rootElement.classList.add('dark-mode');
+     if (darkModeToggle) darkModeToggle.checked = true;
+   }
+
+   // If the toggle exists (only on config page), add change listener
+   if (darkModeToggle) {
+     darkModeToggle.addEventListener('change', () => {
+       if (darkModeToggle.checked) {
+         rootElement.classList.add('dark-mode');
+         localStorage.setItem('darkMode', 'enabled');
+       } else {
+         rootElement.classList.remove('dark-mode');
+         localStorage.setItem('darkMode', 'disabled');
+       }
+     });
+   }
+ });
+ </script>
+</body>
+</html>

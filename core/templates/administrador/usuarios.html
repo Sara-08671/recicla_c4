@@ -1,0 +1,151 @@
+{% extends "administrador/base.html" %}
+{% load static %}
+
+{% block titulo %}Panel de Usuarios{% endblock %}
+
+{% block cuerpo %}
+<link rel="stylesheet" href="{% static 'administrador/css/estilos.css' %}">
+<link rel="stylesheet" href="{% static 'administrador/css/usuarios.css' %}">
+
+{% include 'administrador/header.html' %}
+
+<div class="page-container">
+
+    <h2 class="title">👥 Gestión de Usuarios</h2>
+
+    <div class="top-actions">
+        <a href="{% url 'agregar_usuario' %}" class="btn-add">➕ Agregar Usuario</a>
+    </div>
+
+    <!-- Formulario de búsqueda y filtros -->
+    <form method="get" class="form-inline mb-3" action="{% url 'panel_usuarios' %}">
+        <input type="text" name="q" placeholder="Buscar por nombre, apellido o correo"
+               value="{{ busqueda }}" class="form-control me-2">
+
+        <select name="estado" class="form-control me-2">
+            <option value="">Todos</option>
+            <option value="activo" {% if estado_filtro == "activo" %}selected{% endif %}>Activo</option>
+            <option value="pendiente" {% if estado_filtro == "pendiente" %}selected{% endif %}>Pendiente</option>
+            <option value="aprobado" {% if estado_filtro == "aprobado" %}selected{% endif %}>Aprobado</option>
+            <option value="rechazado" {% if estado_filtro == "rechazado" %}selected{% endif %}>Rechazado</option>
+            <option value="suspendido" {% if estado_filtro == "suspendido" %}selected{% endif %}>Suspendido</option>
+        </select>
+
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+    </form>
+
+    <!-- Tabla principal de usuarios -->
+    <div class="table-container">
+        <table class="users-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Puntaje</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for u in usuarios %}
+                <tr>
+                    <td>{{ u.id_usuario }}</td>
+                    <td>{{ u.nombre }} {{ u.apellido }}</td>
+                    <td>{{ u.correo }}</td>
+                    <td>{{ u.rol }}</td>
+                    <td>{{ u.estado }}</td>
+                    <td>{{ u.puntaje_total }}</td>
+
+                    <td>
+                        <a href="{% url 'editar_usuario' u.id_usuario %}" class="btn-edit">
+                            ✏️ Editar
+                        </a>
+
+                        <a href="{% url 'historial_puntaje_admin' u.id_usuario %}" class="btn-view">
+                          Puntaje
+                        </a>
+
+                        {% if u.estado != "suspendido" %}
+                        <a href="{% url 'suspender_usuario' u.id_usuario %}"
+                           class="btn-delete"
+                           onclick="return confirm('¿Suspender este usuario?');">
+                           Suspender
+                        </a>
+                        {% else %}
+                        <a href="{% url 'reactivar_usuario' u.id_usuario %}"
+                           class="btn-edit">
+                           🔄 Reactivar
+                        </a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="no-data">No hay usuarios registrados</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginación usuarios activos -->
+    <div class="pagination">
+        {% if usuarios.has_previous %}
+        <a href="?page={{ usuarios.previous_page_number }}&q={{ busqueda }}&estado={{ estado_filtro }}">« Anterior</a>
+        {% endif %}
+
+        <span>Página {{ usuarios.number }} de {{ usuarios.paginator.num_pages }}</span>
+
+        {% if usuarios.has_next %}
+        <a href="?page={{ usuarios.next_page_number }}&q={{ busqueda }}&estado={{ estado_filtro }}">Siguiente »</a>
+        {% endif %}
+    </div>
+
+    <h3 class="title mt-5">🚫 Usuarios Suspendidos</h3>
+
+    <!-- Tabla suspendidos -->
+    <table class="users-table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Fecha registro</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            {% for u in suspendidos %}
+            <tr>
+                <td>{{ u.nombre }} {{ u.apellido }}</td>
+                <td>{{ u.correo }}</td>
+                <td>{{ u.fecha_registro }}</td>
+                <td>
+                    <a href="{% url 'reactivar_usuario' u.id_usuario %}" class="btn-edit">
+                        🔄 Reactivar
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4">No hay usuarios suspendidos.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Paginación suspendidos -->
+    <div class="pagination">
+        {% if suspendidos.has_previous %}
+        <a href="?page_sus={{ suspendidos.previous_page_number }}">« Anterior</a>
+        {% endif %}
+
+        <span>Página {{ suspendidos.number }} de {{ suspendidos.paginator.num_pages }}</span>
+
+        {% if suspendidos.has_next %}
+        <a href="?page_sus={{ suspendidos.next_page_number }}">Siguiente »</a>
+        {% endif %}
+    </div>
+
+</div>
+
+{% include 'administrador/footer.html' %}
+{% endblock %}

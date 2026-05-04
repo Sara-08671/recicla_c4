@@ -1,0 +1,32 @@
+body {
+    background: var(--green-bg);
+    font-family: Arial, sans-serif;
+}
+
+form {
+    width: 350px;
+    margin: 50px auto;
+    padding: 20px;
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 0 10px #0003;
+}
+
+input, select, button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+button {
+    background: var(--green-medium);
+    color: white;
+    font-size: 16px;
+    margin-top: 15px;
+}
+
+button:hover {
+    background: var(--green-dark);
+}

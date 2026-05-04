@@ -1,0 +1,26 @@
+
+/* ---------- Secciones y demás ---------- */
+.hero { height:78vh; max-height:760px; background: linear-gradient(rgba(0,0,0,.35), rgba(0,0,0,.35)), url('https://www.ecoavant.com/uploads/s1/25/64/67/dia-mundial-del-reciclaje-2023-1.webp') center/cover no-repeat; border-radius:12px; color:white; display:flex; align-items:center; justify-content:center; text-align:center; padding:60px 20px; margin-bottom:40px; }
+.hero h1 { font-size: 2.6rem; margin-bottom: 16px; line-height:1.05; }
+.hero p { font-size: 1.05rem; margin-bottom: 20px; max-width: 820px; }
+.cta-buttons { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+section { padding: 44px 0; }
+.section-title { text-align:center; margin-bottom:30px; }
+.section-title h2 { font-size:1.8rem; color:var(--dark); margin-bottom:8px; }
+.features-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap:18px; }
+.feature-card { background:white; border-radius:10px; padding:18px; box-shadow: 0 10px 26px rgba(6,47,23,0.05); text-align:center; }
+.feature-card .icon { font-size:28px; color:var(--primary); margin-bottom:10px; }
+.steps { display:flex; flex-wrap:wrap; gap:14px; justify-content:center; }
+.step { width:220px; background:white; padding:14px; border-radius:10px; text-align:center; box-shadow:0 8px 18px rgba(0,0,0,0.05); }
+.step-number { width:44px; height:44px; border-radius:50%; background:var(--primary); color:white; display:grid; place-items:center; margin:0 auto 8px; font-weight:700; }
+.testimonials-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap:16px; }
+.testimonial-card { background:white; padding:16px; border-radius:10px; box-shadow:0 8px 18px rgba(0,0,0,0.05); }
+.rewards-grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(200px,1fr)); gap:14px; }
+
+.hero div {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* centra horizontalmente */
+    text-align: center;  /* asegura que el texto de varias líneas también esté centrado */
+}
+

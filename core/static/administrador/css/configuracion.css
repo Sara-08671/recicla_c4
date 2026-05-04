@@ -1,0 +1,177 @@
+/* ============================
+   CONFIGURACIÓN (residente)
+===============================*/
+
+.config-title {
+    font-size: 28px;
+    margin-bottom: 25px;
+    font-weight: 700;
+    color: var(--dark);
+}
+
+.config-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+    gap: 30px;
+}
+
+.config-card {
+    background: #fff;
+    padding: 22px;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+}
+
+.config-card h3 {
+    margin-bottom: 16px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.config-card label {
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.config-card input {
+    width: 100%;
+    padding: 10px;
+    margin-top: 4px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+.config-card input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 6px rgba(46, 204, 113, 0.4);
+}
+
+.btn-save {
+    margin-top: 16px;
+    width: 100%;
+    background: var(--primary);
+    color: white;
+    padding: 10px;
+    border-radius: 12px;
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-save:hover {
+    background: var(--secondary);
+    transform: translateY(-2px);
+}
+
+/* SWITCH */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 22px;
+}
+
+.switch input {
+    opacity: 0; width: 0; height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px; width: 18px;
+    left: 2px; bottom: 2px;
+    background: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: var(--primary);
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.toggle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 14px 0;
+    font-weight: 600;
+}
+
+/* ============================
+   CONFIGURACIÓN - Contraseña
+===============================*/
+
+.config-password {
+    background: #fff;
+    padding: 22px;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+}
+
+.config-password h3 {
+    margin-bottom: 16px;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+/* Etiquetas */
+.config-password label {
+    font-size: 14px;
+    font-weight: 600;
+    display: block;
+    margin-top: 12px;
+}
+
+/* Inputs de contraseña */
+.config-password input[type="password"] {
+    width: 100%;
+    padding: 10px 12px;
+    margin-top: 4px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.config-password input[type="password"]:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 6px rgba(46, 204, 113, 0.4);
+}
+
+/* Botón guardar */
+.config-password .btn-save {
+    width: 100%;
+    margin-top: 18px;
+    background: var(--primary);
+    color: white;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 15px;
+    border: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.config-password .btn-save:hover {
+    background: var(--secondary);
+    transform: translateY(-2px);
+}

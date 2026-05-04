@@ -1,0 +1,56 @@
+{% extends "administrador/base.html" %}
+{% load static %}
+{% block titulo %}Nueva Publicación - Foro{% endblock %}
+
+{% block cabeza_extra %}
+<link rel="stylesheet" href="{% static 'administrador/css/estilos.css' %}">
+<link rel="stylesheet" href="{% static 'administrador/css/foro.css' %}">
+{% endblock %}
+
+{% block cuerpo %}
+{% include 'administrador/header.html' %}
+
+<main>
+  <div class="wrapper">
+    <div class="form-container">
+      <h1>📝 Nueva Publicación en el Foro</h1>
+
+      <div class="card">
+        <form action="{% url 'admi_publicacion_foro' %}" method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <!-- Título -->
+          <div class="campo">
+            <label for="titulo">📌 Título del tema:</label>
+            <input type="text" id="titulo" name="titulo" placeholder="Escribe un título llamativo" required>
+          </div>
+
+          <!-- Contenido -->
+          <div class="campo">
+            <label for="contenido">💬 Contenido del mensaje:</label>
+            <textarea id="contenido" name="contenido" placeholder="Escribe aquí tu publicación..." required></textarea>
+          </div>
+
+          <!-- Archivo opcional -->
+          <div class="campo">
+            <label for="archivo">📎 Adjuntar archivo (opcional):</label>
+            <input type="file" id="archivo" name="archivo">
+          </div>
+
+          <!-- Botones -->
+          <div style="display:flex; gap:15px; justify-content:center; margin-top:20px;">
+            <a href="{% url 'admi_foro_publicaciones' %}" 
+              style="background:#ED4E4E; color:white; padding:10px 20px; border-radius:10px; text-decoration:none;">
+              ❌ Cancelar
+            </a>
+
+            <button type="submit">✅ Publicar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</main>
+
+{% include 'administrador/footer.html' %}
+{% endblock %}

@@ -1,0 +1,136 @@
+/* =============================
+   EDUCACIÓN AMBIENTAL
+============================= */
+
+/* HERO */
+.edu-hero {
+    text-align: center;
+    padding: 70px 20px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+    margin-bottom: 50px;
+}
+
+.edu-hero h1 {
+    font-size: 36px;
+    font-weight: 700;
+}
+
+.edu-hero p {
+    margin-top: 8px;
+    font-size: 16px;
+    opacity: 0.95;
+}
+
+/* SECCIONES GENERALES */
+.edu-section {
+    margin-bottom: 60px;
+}
+
+.edu-section h2 {
+    text-align: center;
+    font-size: 28px;
+    margin-bottom: 18px;
+    color: var(--secondary);
+}
+
+.edu-intro {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 30px;
+    color: var(--muted);
+}
+
+/* GRID DE TARJETAS */
+.edu-grid {
+    display: grid;
+    gap: 25px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.edu-card {
+    background: white;
+    padding: 20px;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    transition: 0.25s;
+}
+
+.edu-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+.edu-icon {
+    font-size: 32px;
+    margin-bottom: 10px;
+}
+
+/* STEPS */
+.steps {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.step {
+    background: white;
+    padding: 16px;
+    border-radius: var(--radius);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+.step span {
+    width: 40px;
+    height: 40px;
+    background: var(--secondary);
+    color: white;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    font-weight: bold;
+}
+
+/* RECICLABLES / NO RECICLABLES */
+.recycle-box {
+    display: grid;
+    gap: 25px;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.recycle-box div {
+    background: white;
+    padding: 20px;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+}
+
+.yes h3 { color: var(--secondary); }
+.no h3 { color: #d63031; }
+
+/* CONSEJOS */
+.tips-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 15px;
+}
+
+.tip-item {
+    background: var(--bg-2);
+    padding: 15px;
+    border-radius: var(--radius);
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    font-size: 15px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+}
+
+.tip-item span {
+    font-size: 22px;
+}

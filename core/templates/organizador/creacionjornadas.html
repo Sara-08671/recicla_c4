@@ -1,0 +1,415 @@
+{% extends "organizador/base.html" %}
+{% load static %}
+{% block titulo %}Creación de jornadas de reciclaje{% endblock %}
+
+{% block cabeza_extra %}
+<link rel="stylesheet" href="{% static 'organizador/css/estilos.css' %}">
+<link rel="stylesheet" href="{% static 'organizador/css/creacion_jornadas.css' }">
+{% endblock %}
+
+{% block cuerpo %}
+{% include 'organizador/header.html' %}
+
+<main class="page-container">
+
+<div class="wrapper">
+
+  <!-- Panel Izquierdo -->
+  <div class="left-panel">
+      <h1 class="titulo">🌱 Jornadas de Reciclaje</h1>
+      <p class="descripcion">
+        Este es el <strong>formulario oficial</strong> para la creación de jornadas de reciclaje.
+        Aquí podrás registrar la fecha, hora, barrio, punto de encuentro y tipo de material.
+        <br><br>
+        🌍 ¡Tu participación ayuda a construir una comunidad más limpia y sostenible!
+      </p>
+  </div>
+
+  <!-- Formulario derecho -->
+  <form method="POST" action="{% url 'admi_creacion_jornadas' %}">
+      {% csrf_token %}
+      <h2>Formulario de Jornada</h2>
+
+      <div class="campo full">
+          <label for="titulo">Título de la jornada:</label>
+          <input type="text" id="titulo" name="titulo" required>
+      </div>
+
+      <div class="campo full">
+          <label for="descripcion">📝 Descripción:</label>
+          <textarea id="descripcion" name="descripcion" required></textarea>
+      </div>
+
+      <div class="campo">
+          <label for="fecha">📅 Fecha:</label>
+          <input type="date" id="fecha" name="fecha" required>
+      </div>
+
+      <div class="campo">
+          <label for="hora">⏰ Hora:</label>
+          <input type="time" id="hora" name="hora" required>
+      </div>
+
+      <div class="campo">
+          <label for="barrio">🏘️ Barrio:</label>
+          <select id="barrio" name="barrio" required>
+              <option disabled selected>Selecciona un barrio</option>
+              <option>San José</option>
+              <option>El Poblado</option>
+              <option>La Esperanza</option>
+              <option>Villa Verde</option>
+          </select>
+      </div>
+
+      <div class="campo">
+          <label for="direccion">📍 Dirección:</label>
+          <input type="text" id="direccion" name="direccion" required>
+      </div>
+
+      <div class="campo">
+          <label for="tipo_material">♻️ Tipo de material:</label>
+          <select id="tipo_material" name="tipo_material" required>
+              <option disabled selected>Selecciona</option>
+              <option>Plástico</option>
+              <option>Vidrio</option>
+              <option>Papel y cartón</option>
+              <option>Metales</option>
+          </select>
+      </div>
+
+      <div class="campo">
+          <label for="cupo_maximo">Cupo máximo:</label>
+          <input type="number" id="cupo_maximo" name="cupo_maximo" min="1" required>
+      </div>
+
+      <div class="campo full">
+          <label for="estado">Estado:</label>
+          <select id="estado" name="estado" required>
+              <option disabled selected>Selecciona estado</option>
+              <option value="pendiente">Pendiente</option>
+              <option value="activa">Activa</option>
+              <option value="en_curso">En curso</option>
+              <option value="finalizada">Finalizada</option>
+              <option value="cancelada">Cancelada</option>
+          </select>
+      </div>
+
+      <div class="campo full">
+          <button type="submit">✅ Crear Jornada</button>
+      </div>
+
+  </form>
+
+</div>
+
+<!-- =================== Historial de Jornadas =================== -->
+<div class="historial-jornadas" style="margin-top: 50px;">
+    <h2>📜 Historial de Jornadas</h2>
+    <table class="tabla-jornadas">
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Barrio</th>
+                <th>Material</th>
+                <th>Cupo</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for j in jornadas %}
+<tr>
+    <td>{{ j.titulo }}</td>
+    <td>{{ j.fecha }}</td>
+    <td>{{ j.hora }}</td>
+    <td>{{ j.barrio }}</td>
+    <td>{{ j.tipo_material }}</td>
+    <td style="font-weight: 600;
+        color: {% if j.cupo_maximo and j.inscritos_activos >= j.cupo_maximo %}#E74C3C{% else %}#27ae60{% endif %};">
+        {{ j.inscritos_activos }} / {{ j.cupo_maximo }}
+        {% if j.cupo_maximo and j.inscritos_activos >= j.cupo_maximo %}
+            <span style="font-size: 11px; display: block;">CUPO LLENO</span>
+        {% endif %}
+    </td>
+    <td>{{ j.estado }}</td>
+    <td class="acciones">
+        <a href="{% url 'organizador_modificar_jornada' j.id_jornada %}" class="btn-modificar">✏️ Modificar</a>
+        <a href="{% url 'organizador_eliminar_jornada' j.id_jornada %}" class="btn-eliminar" onclick="return confirm('¿Seguro que deseas eliminar esta jornada?');">🗑️ Eliminar</a>
+    </td>
+</tr>
+{% empty %}
+<tr>
+    <td colspan="8" style="text-align:center;">No hay jornadas registradas.</td>
+</tr>
+{% endfor %}
+        </tbody>
+    </table>
+</div>
+
+</main>
+
+{% include 'organizador/footer.html' %}
+
+<style>
+.tabla-jornadas {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.tabla-jornadas th, .tabla-jornadas td {
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+    font-size: 0.95rem;
+}
+
+.tabla-jornadas th {
+    background-color: var(--bg-2);
+    color: var(--dark);
+    font-weight: 600;
+}
+
+.tabla-jornadas tr:hover {
+    background-color: var(--bg-1);
+}
+
+td.acciones {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-modificar {
+    background: var(--primary);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: 0.2s ease;
+}
+
+.btn-modificar:hover {
+    background: var(--secondary);
+}
+
+.btn-eliminar {
+    background: #E74C3C;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: 0.2s ease;
+}
+
+.btn-eliminar:hover {
+    background: #C0392B;
+}
+/* ============================
+   FORMULARIO DE CREACIÓN DE JORNADAS (V2)
+   ============================ */
+
+/* Contenedor general */
+.wrapper {
+    display: grid;
+    grid-template-columns: 0.9fr 1.4fr;
+    gap: 40px;
+    margin-top: 30px;
+}
+
+/* ============================
+   PANEL IZQUIERDO (más compacto)
+   ============================ */
+.left-panel {
+    background: linear-gradient(180deg, var(--bg-2), #ffffff);
+    padding: 20px 22px;
+    border-radius: var(--radius);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    max-height: 350px; /* 🔥 Más compacto */
+    overflow: hidden;
+}
+
+.left-panel .titulo {
+    font-size: 1.7rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--secondary);
+}
+
+.left-panel .descripcion {
+    font-size: 1rem;
+    color: var(--muted);
+    line-height: 1.55;
+}
+
+/* ============================
+   FORMULARIO TIPO "BALCÓN"
+   ============================ */
+form {
+    background: white; /* Blanco para destacar */
+    padding: 32px;
+    border-radius: var(--radius);
+    box-shadow: 
+        0 12px 28px rgba(0,0,0,0.12),
+        0 4px 12px rgba(0,0,0,0.05);
+    position: relative;
+    z-index: 5;
+}
+
+form h2 {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 18px;
+}
+
+/* Campos */
+.campo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+.campo.full {
+    grid-column: span 2;
+}
+
+label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--dark);
+}
+
+input, select, textarea {
+    padding: 10px 12px;
+    border: 2px solid rgba(46, 204, 113, 0.3);
+    border-radius: var(--radius);
+    background: white;
+    color: var(--dark);
+    font-size: 1rem;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 8px rgba(46, 204, 113, 0.35);
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Botón principal */
+button[type="submit"] {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 30px;
+    cursor: pointer;
+    width: 100%;
+    transition: transform 0.2s ease, background 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    transform: translateY(-3px);
+    background: var(--secondary);
+}
+
+/* ============================
+   HISTORIAL DE JORNADAS
+   ============================ */
+.historial-jornadas {
+    margin-top: 50px;
+}
+
+.tabla-jornadas {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.tabla-jornadas th, .tabla-jornadas td {
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+    font-size: 0.95rem;
+}
+
+.tabla-jornadas th {
+    background-color: var(--bg-2);
+    color: var(--dark);
+    font-weight: 600;
+}
+
+.tabla-jornadas tr:hover {
+    background-color: var(--bg-1);
+}
+
+/* Botones de acción */
+td.acciones {
+    display: flex;
+    gap: 6px;
+}
+
+.btn-modificar {
+    background: var(--primary);
+    color: white;
+    padding: 5px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: 0.2s ease;
+}
+
+.btn-modificar:hover {
+    background: var(--secondary);
+}
+
+.btn-eliminar {
+    background: #E74C3C;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: 0.2s ease;
+}
+
+.btn-eliminar:hover {
+    background: #C0392B;
+}
+
+/* ============================
+   RESPONSIVO
+   ============================ */
+@media (max-width: 900px) {
+    .wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .left-panel {
+        max-height: none;
+    }
+
+    td.acciones {
+        flex-direction: column;
+    }
+
+    .btn-modificar, .btn-eliminar {
+        width: 100%;
+    }
+}
+
+</style>
+
+{% endblock %}

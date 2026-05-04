@@ -1,0 +1,105 @@
+{% extends "administrador/base.html" %}
+{% load static %}
+
+{% block titulo %}Perfil Administrador{% endblock %}
+
+{% block cabeza_extra %}
+<link rel="stylesheet" href="{% static 'administrador/css/estilos.css' %}">
+<link rel="stylesheet" href="{% static 'administrador/css/perfil.css' %}">
+{% endblock %}
+
+{% block cuerpo %}
+
+{% include 'administrador/header.html' %}
+
+<div class="perfil-container">
+
+    <!-- Foto -->
+    <div class="profile-photo-container">
+        {% if usuario.foto %}
+            <img src="{{ usuario.foto.url }}" alt="Foto de perfil" class="profile-photo">
+        {% else %}
+            <img src="{% static 'administrador/img/default-avatar.png' %}" alt="Foto de perfil" class="profile-photo">
+        {% endif %}
+    </div>
+
+    <div style="text-align:center; margin-bottom:20px;">
+        <a href="{% url 'cambiar_foto_admin' %}" class="change-photo-btn">Cambiar Foto</a>
+    </div>
+
+    <!-- Información del Usuario -->
+    <div class="card">
+        <div class="card-title">👤 Información Personal</div>
+        <div class="profile-info">
+            <p><strong>Nombre:</strong> {{ usuario.nombre }} {{ usuario.apellido }}</p>
+            <p><strong>Correo:</strong> {{ usuario.correo }}</p>
+            <p><strong>Rol:</strong> {{ usuario.rol|capfirst }}</p>
+            <p><strong>Estado:</strong> {{ usuario.estado|capfirst }}</p>
+        </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="card">
+        <div class="card-title">📈 Estadísticas de Participación</div>
+        <p><strong>Puntos acumulados:</strong> {{ total_puntos }}</p>
+        <p><strong>Última actividad:</strong> 
+            {% if puntajes.first %}
+                {{ puntajes.first.fecha|date:"d/m/Y H:i" }}
+            {% else %}
+                Sin actividad
+            {% endif %}
+        </p>
+    </div>
+
+    <!-- Puntos grandes -->
+    <div class="points-card">
+        <h2>Mis Puntos Acumulados</h2>
+        <div class="big-points">{{ total_puntos }}</div>
+    </div>
+
+    <!-- Resumen de actividad -->
+    <div class="card">
+        <div class="card-title">📊 Resumen de Actividad</div>
+        <p><strong>Total de registros de puntos:</strong> {{ puntajes.count }}</p>
+        <p><strong>Puntaje más alto recibido:</strong> {{ mayor_puntaje }}</p>
+        <p><strong>Promedio por actividad:</strong> {{ promedio }}</p>
+    </div>
+
+    <!-- Tabla moderna -->
+    <div class="table-container">
+        <table class="table-modern">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Jornada</th>
+                    <th>Puntos</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in puntajes %}
+                <tr>
+                    <td>{{ p.fecha|date:"d/m/Y H:i" }}</td>
+                    <td>{{ p.jornada.titulo }}</td>
+                    <td>{{ p.puntos }}</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3">No hay puntajes aún.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="btn-group">
+        <a href="{% url 'admi_inicio' %}" class="btn-action">🏠 Inicio</a>
+        <a href="{% url 'admi_configuracion' %}" class="btn-action">⚙️ Configuración</a>
+        <a href="{% url 'cambiar_foto_admin' %}" class="btn-action">📷 Cambiar Foto</a>
+        <a href="{% url 'logout' %}" class="btn-action">🚪 Cerrar Sesión</a>
+    </div>
+
+</div>
+
+{% include 'administrador/footer.html' %}
+{% endblock %}

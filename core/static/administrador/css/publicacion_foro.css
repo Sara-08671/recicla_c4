@@ -1,0 +1,76 @@
+/* ========================
+   FORO - Página de publicaciones
+======================== */
+
+.foro-page {
+    padding-bottom: 40px;
+}
+
+/* Hero */
+.foro-hero {
+    text-align: center;
+    padding: 50px 20px;
+}
+
+.foro-hero h1 {
+    font-size: 2.4rem;
+}
+
+.foro-hero p {
+    color: #555;
+    margin-top: 5px;
+}
+
+/* Lista */
+.foro-lista {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Tarjetas */
+.foro-card {
+    background: #ffffff;
+    padding: 25px;
+    margin-bottom: 20px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: .3s;
+}
+
+.foro-card:hover {
+    transform: translateY(-4px);
+}
+
+.foro-card h3 {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+}
+
+.foro-contenido {
+    font-size: 1rem;
+    color: #444;
+    margin-bottom: 15px;
+}
+
+.foro-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: .9rem;
+    color: #666;
+}
+
+.no-pub {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 1.1rem;
+    color: #555;
+}
+
+/* Responsive */
+@media (max-width: 760px) {
+    .foro-footer {
+        flex-direction: column;
+        gap: 5px;
+    }
+}

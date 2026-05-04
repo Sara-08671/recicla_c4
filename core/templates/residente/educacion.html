@@ -1,0 +1,162 @@
+{% extends "residente/base.html" %}
+{% load static %}
+
+{% block titulo %}Recicla Comuna 4 — Educación Ambiental{% endblock %}
+
+{% block cabeza_extra %}
+<link rel="stylesheet" href="{% static 'residente/css/estilos_residentes.css' %}">
+<link rel="stylesheet" href="{% static 'residente/css/educacion.css' %}">
+{% endblock %}
+
+{% block cuerpo %}
+{% include 'residente/header.html' %}
+
+<main class="page-container edu-page">
+
+    <!-- HERO -->
+    <section class="edu-hero">
+        <h1>🌱 Educación Ambiental</h1>
+        <p>Aprende a reciclar, reducir, reutilizar y transformar tu entorno en la Comuna 4.</p>
+    </section>
+
+    <!-- POR QUÉ RECICLAR -->
+    <section class="edu-section">
+        <h2>♻ ¿Por qué reciclar?</h2>
+        <p class="edu-intro">
+            El reciclaje es una de las acciones más simples y eficaces para proteger el medio ambiente.
+            Cada residuo separado correctamente ayuda a prevenir contaminación, reduce el consumo de recursos
+            naturales y fortalece nuestra economía comunitaria.
+        </p>
+
+        <div class="edu-grid">
+            <div class="edu-card">
+                <div class="edu-icon">🌎</div>
+                <h3>Protege el planeta</h3>
+                <p>Reciclar reduce la contaminación del aire, del suelo y del agua. Evita que los residuos lleguen a ríos y quebradas.</p>
+            </div>
+
+            <div class="edu-card">
+                <div class="edu-icon">🔥</div>
+                <h3>Menos basura</h3>
+                <p>Cuando clasificamos adecuadamente, disminuimos los residuos que terminan en rellenos sanitarios o quemados.</p>
+            </div>
+
+            <div class="edu-card">
+                <div class="edu-icon">💰</div>
+                <h3>Economía circular</h3>
+                <p>Genera empleo, impulsa negocios verdes y fortalece a recuperadores ambientales de la Comuna 4.</p>
+            </div>
+
+            <div class="edu-card">
+                <div class="edu-icon">🏡</div>
+                <h3>Mejora tu comunidad</h3>
+                <p>Un barrio limpio y organizado mejora la salud, la convivencia y la seguridad de los residentes.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- COMO RECICLAR -->
+    <section class="edu-section">
+        <h2>📝 ¿Cómo reciclar correctamente?</h2>
+
+        <div class="steps">
+            <div class="step">
+                <span>1</span>
+                <p>Separa tus residuos: plástico, papel, cartón, vidrio y metal.</p>
+            </div>
+
+            <div class="step">
+                <span>2</span>
+                <p>Lava y seca los envases para evitar malos olores y contaminación del material.</p>
+            </div>
+
+            <div class="step">
+                <span>3</span>
+                <p>Aplasta botellas y cajas para reducir el volumen dentro de tu bolsa de reciclaje.</p>
+            </div>
+
+            <div class="step">
+                <span>4</span>
+                <p>Deposita el material en bolsas transparentes y entrégalo en jornadas o puntos autorizados.</p>
+            </div>
+
+            <div class="step">
+                <span>5</span>
+                <p>Evita mezclar residuos orgánicos con reciclables. Todo debe ir limpio.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- QUÉ SE RECICLA -->
+    <section class="edu-section">
+        <h2>📦 ¿Qué se recicla y qué no?</h2>
+
+        <div class="recycle-box">
+            <div class="yes">
+                <h3>✔ Reciclables</h3>
+                <ul>
+                    <li>Botellas PET (transparente, verde, azul)</li>
+                    <li>Papel y cartón secos</li>
+                    <li>Vidrio (frascos y botellas)</li>
+                    <li>Latas de aluminio</li>
+                    <li>Envases plásticos limpios</li>
+                    <li>Chatarra metálica</li>
+                </ul>
+            </div>
+
+            <div class="no">
+                <h3>✘ No reciclables</h3>
+                <ul>
+                    <li>Servilletas o papeles contaminados</li>
+                    <li>Papel higiénico</li>
+                    <li>Icopor sucio o manchado</li>
+                    <li>Papel metalizado o aluminio delgado</li>
+                    <li>Desechos orgánicos</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONSEJOS -->
+    <section class="edu-tips">
+        <h2>💡 Consejos rápidos</h2>
+
+        <div class="tips-list">
+
+            <div class="tip-item">
+                <span>🍶</span>
+                <p>Usa poca agua para lavar los envases. Solo enjuaga ligeramente.</p>
+            </div>
+
+            <div class="tip-item">
+                <span>🛍</span>
+                <p>Lleva tu propia bolsa reutilizable al mercado.</p>
+            </div>
+
+            <div class="tip-item">
+                <span>🌱</span>
+                <p>Comienza un pequeño compostaje en casa con tus residuos orgánicos.</p>
+            </div>
+
+            <div class="tip-item">
+                <span>📦</span>
+                <p>Guarda cajas y frascos para reutilizarlos en tu hogar.</p>
+            </div>
+
+            <div class="tip-item">
+                <span>🚯</span>
+                <p>No tires colillas, chicles ni envolturas en la calle: también contaminan.</p>
+            </div>
+
+            <div class="tip-item">
+                <span>👟</span>
+                <p>Dona ropa, calzado y objetos que aún pueden servir a otras personas.</p>
+            </div>
+
+        </div>
+    </section>
+
+</main>
+
+{% include 'residente/footer.html' %}
+{% endblock %}

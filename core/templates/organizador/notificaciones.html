@@ -1,0 +1,97 @@
+{% extends "organizador/base.html" %}
+{% load static %}
+
+{% block cabeza_extra %}
+<link rel="stylesheet" href="{% static 'organizador/css/estilos.css' %}">
+{% endblock %}
+
+{% block cuerpo %}
+
+<style>
+/* ======== ESTILOS DE NOTIFICACIONES (COMPATIBLE CON estilos_residentes.css) ======== */
+
+.notificaciones-wrapper {
+    max-width: 900px;
+    margin: 100px auto 40px; /* el margin-top compensa el header */
+    padding: 0 20px;
+    padding-bottom: 500px; /* espacio para que el footer quede abajo */
+}
+
+h2 {
+    color: var(--dark);
+    font-size: 1.9rem;
+    margin-bottom: 25px;
+}
+
+/* Contenedor general */
+.notificaciones-container {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+/* Tarjeta */
+.notificacion {
+    background: white;
+    padding: 18px 20px;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    border-left: 6px solid var(--primary);
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.notificacion:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+}
+
+/* Título del tipo */
+.notificacion strong {
+    font-size: 1.15rem;
+    color: var(--secondary);
+}
+
+/* Mensaje */
+.notificacion p {
+    margin: 10px 0 6px;
+    color: var(--muted);
+    font-size: 0.95rem;
+}
+
+/* Fecha */
+.notificacion span {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 0.8rem;
+    color: #7d8a88;
+}
+</style>
+
+<!-- ========== HEADER ========== -->
+{% include 'organizador/header.html' %}
+
+<!-- ========== CONTENIDO ========== -->
+<div class="notificaciones-wrapper">
+    <h2>📬 Mis Notificaciones</h2>
+
+    <div class="notificaciones-container">
+        {% if notificaciones %}
+            {% for n in notificaciones %}
+                <div class="notificacion">
+                    <strong>{{ n.tipo }}</strong>
+                    <p>{{ n.mensaje }}</p>
+                    <span>{{ n.fecha_envio|date:"d/m/Y H:i" }}</span>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p style="color: var(--muted); font-weight: 500;">
+                No tienes notificaciones por ahora.
+            </p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- ========== FOOTER ========== -->
+{% include 'organizador/footer.html' %}
+{% endblock %}

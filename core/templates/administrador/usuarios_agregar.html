@@ -1,0 +1,45 @@
+{% extends "administrador/base.html" %}
+{% load static %}
+
+{% block cuerpo %}
+<link rel="stylesheet" href="{% static 'administrador/css/estilos.css' %}">
+<link rel="stylesheet" href="{% static 'administrador/css/usuarios.css' %}">
+{% include 'administrador/header.html' %}
+<div class="page-container">
+
+    <h2 class="title">➕ Agregar Usuario</h2>
+
+    <form method="POST" class="form-card">
+        {% csrf_token %}
+
+        <label>Nombre</label>
+        <input type="text" name="nombre" required>
+
+        <label>Apellido</label>
+        <input type="text" name="apellido" required>
+
+        <label>Correo</label>
+        <input type="email" name="correo" required>
+
+        <label>Contraseña</label>
+        <input type="password" name="contrasena" required>
+
+        <label>Rol</label>
+        <select name="rol">
+            <option value="residente">Residente</option>
+            <option value="organizador">Organizador</option>
+            <option value="administrador">Administrador</option>
+        </select>
+
+        <label>Estado</label>
+        <select name="estado">
+            <option value="activo">Activo</option>
+            <option value="suspendido">Suspendido</option>
+        </select>
+
+        <button class="btn-save">Guardar</button>
+    </form>
+
+</div>
+{% include 'administrador/footer.html' %}
+{% endblock %}

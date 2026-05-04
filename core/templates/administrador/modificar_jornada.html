@@ -1,0 +1,120 @@
+{% extends "administrador/base.html" %}
+{% load static %}
+{% block titulo %}Modificar jornada{% endblock %}
+
+{% block cabeza_extra %}
+<link rel="stylesheet" href="{% static 'administrador/css/estilos.css' %}">
+<style>
+    /* ===========================
+       Formulario Modificar Jornada
+       =========================== */
+
+    h2 {
+        font-family: 'Poppins', sans-serif;
+        color: var(--dark);
+        text-align: center;
+        margin: 30px 0 20px 0;
+        font-weight: 600;
+    }
+
+    form {
+        max-width: 650px;
+        margin: 0 auto 40px auto;
+        background-color: var(--bg-2);
+        padding: 30px;
+        border-radius: var(--radius);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    form p {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 18px;
+    }
+
+    form label {
+        font-weight: 500;
+        color: var(--muted);
+        margin-bottom: 6px;
+    }
+
+    form input,
+    form select,
+    form textarea {
+        padding: 12px;
+        border-radius: calc(var(--radius)/2);
+        border: 1px solid #ccc;
+        font-size: 14px;
+        width: 100%;
+        box-sizing: border-box;
+        transition: all 0.25s ease;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    form input:focus,
+    form select:focus,
+    form textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 5px rgba(46,204,113,0.3);
+    }
+
+    /* Botón guardar */
+    .btn {
+        display: inline-block;
+        background-color: #27AE60;
+        color: #fff;
+        padding: 12px 22px;
+        border-radius: var(--radius);
+        border: none;
+        cursor: pointer;
+        font-size: 15px;
+        font-weight: 500;
+        transition: background 0.3s ease, transform 0.2s ease;
+        text-align: center;
+        text-decoration: none;
+    }
+
+    .btn:hover {
+        background-color: #27AE60;
+        transform: translateY(-2px);
+    }
+
+    a.btn {
+        display: block;
+        margin-top: 15px;
+        text-align: center;
+        background-color: #27AE60;
+        color: #333;
+    }
+
+    a.btn:hover {
+        background-color:#27AE60;
+        color: #fff;
+    }
+
+    /* Responsivo */
+    @media (max-width: 640px) {
+        form {
+            padding: 20px;
+            margin: 0 10px 30px 10px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block cuerpo %}
+{% include 'administrador/header.html' %}
+
+<h2>✏️ Modificar Jornada: {{ jornada.titulo }}</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn">Guardar Cambios</button>
+</form>
+
+
+
+{% include 'administrador/footer.html' %}
+{% endblock %}

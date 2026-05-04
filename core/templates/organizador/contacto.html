@@ -1,0 +1,63 @@
+{% extends "organizador/base.html" %}
+{% load static %}
+{% block titulo %}Recicla Comuna 4{% endblock %}
+
+{% block cabeza_extra %}
+ <link rel="stylesheet" href="{% static 'organizador/css/estilos.css' %}">
+ <link rel="stylesheet" href="{% static 'organizador/css/contacto.css' %}">
+{% endblock %}
+
+{% block cuerpo %}
+{% include 'organizador/header.html' %}
+
+
+<!-- CONTACTANOS -->
+<section class="contacto-section">
+    <h2>📬 Contáctanos</h2>
+    <p class="contacto-desc">
+        Si tienes dudas, sugerencias o deseas unirte a nuestras iniciativas ambientales, ¡escríbenos!
+    </p>
+
+    <div class="contacto-grid">
+
+        <!-- Información -->
+        <div class="contacto-info">
+            <h3>💬 Información de contacto</h3>
+            <ul>
+                <li><strong>📍 Ubicación:</strong> Comuna 4 — Medellín</li>
+                <li><strong>📞 Teléfono:</strong> 300 000 0000</li>
+                <li><strong>✉ Correo:</strong> recicla.comuna4@gmail.com</li>
+                <li><strong>🕒 Horario:</strong> Lunes a sábado — 8:00 a 5:00 p.m.</li>
+            </ul>
+        </div>
+
+        <!-- Formulario -->
+        <form class="contacto-form">
+            <h3>📨 Envíanos un mensaje</h3>
+
+            <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" placeholder="Escribe tu nombre">
+            </div>
+
+            <div class="form-group">
+                <label>Correo electrónico</label>
+                <input type="email" placeholder="tucorreo@ejemplo.com">
+            </div>
+
+            <div class="form-group">
+                <label>Mensaje</label>
+                <textarea rows="4" placeholder="Cuéntanos cómo podemos ayudarte"></textarea>
+            </div>
+
+            <button type="submit" class="btn-contacto">Enviar mensaje</button>
+        </form>
+
+    </div>
+</section>
+
+
+{% include 'organizador/footer.html' %}
+
+
+{% endblock %}

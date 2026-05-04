@@ -1,0 +1,85 @@
+```html
+{% extends "residente/base.html" %}
+{% load static %}
+
+{% block titulo %}Jornadas disponibles{% endblock %} 
+
+{% block cuerpo %}
+<link rel="stylesheet" href="{% static 'residente/css/estilos_residentes.css' %}">
+<link rel="stylesheet" href="{% static 'residente/css/listaj.css' %}">
+
+{% include "residente/header.html" %}
+<main class="page-container">
+    <h1>📅 Jornadas de Reciclaje</h1>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div style="padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;
+                background: {% if message.tags == 'error' %}#fdecea{% else %}#e8f5e9{% endif %};
+                color: {% if message.tags == 'error' %}#c0392b{% else %}#27ae60{% endif %};
+                border: 1px solid {% if message.tags == 'error' %}#f5c6cb{% else %}#a3d9a5{% endif %};">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if jornadas %}
+        <ul class="lista-jornadas">
+            {% for j in jornadas %}
+                <li class="jornada-item">
+                    <h2>{{ j.titulo }}</h2>
+                    <p><strong>Fecha:</strong> {{ j.fecha }}</p>
+                    <p><strong>Hora:</strong> {{ j.hora }}</p>
+                    <p><strong>Barrio:</strong> {{ j.barrio }}</p>
+
+                    {% if j.estado == 'activa' %}
+                        {% if j.cupo_maximo %}
+                            {% if j.inscritos_activos >= j.cupo_maximo %}
+                                <p style="color: #E74C3C; font-weight: 600;">
+                                    Cupo lleno ({{ j.inscritos_activos }}/{{ j.cupo_maximo }})
+                                </p>
+                                <span style="background:#E74C3C; color:white; padding: 5px 12px;
+                                             border-radius: 20px; font-size: 13px;">
+                                    Sin cupos disponibles
+                                </span>
+                            {% else %}
+                                <p style="color: #27ae60; font-weight: 600;">
+                                    Cupos disponibles: {{ j.inscritos_activos }}/{{ j.cupo_maximo }}
+                                </p>
+                                <a href="{% url 'residente_inscripcion' j.id_jornada %}" class="btn-ver">
+                                    Inscribirse
+                                </a>
+                            {% endif %}
+                        {% else %}
+                            <p style="color: #27ae60;">Sin limite de cupo</p>
+                            <a href="{% url 'residente_inscripcion' j.id_jornada %}" class="btn-ver">
+                                Inscribirse
+                            </a>
+                        {% endif %}
+                    {% elif j.estado == 'finalizada' %}
+                        <span style="background: #888; color: white; padding: 5px 12px;
+                                     border-radius: 20px; font-size: 13px;">
+                            Jornada finalizada
+                        </span>
+                    {% elif j.estado == 'pendiente' %}
+                        <span style="background: #f39c12; color: white; padding: 5px 12px;
+                                     border-radius: 20px; font-size: 13px;">
+                            Proximamente
+                        </span>
+                    {% elif j.estado == 'en_curso' %}
+                        <span style="background: #e67e22; color: white; padding: 5px 12px;
+                                     border-radius: 20px; font-size: 13px;">
+                            Jornada en curso
+                        </span>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No hay jornadas disponibles.</p>
+    {% endif %}
+
+</main>
+{% include "residente/footer.html" %}
+{% endblock %}
+```

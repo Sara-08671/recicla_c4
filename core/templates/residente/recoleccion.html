@@ -1,0 +1,129 @@
+{% extends "residente/base.html" %}
+{% load static %}
+{% block titulo %}Registro de Recolección — Recicla Comuna 4{% endblock %}
+
+{% block cabeza_extra %}
+  <link rel="stylesheet" href="{% static 'residente/css/estilos_residentes.css' %}">
+  <link rel="stylesheet" href="{% static 'residente/css/recoleccion.css' %}">
+{% endblock %}
+
+{% block cuerpo %}
+{% include 'residente/header.html' %}
+
+
+<main class="page-container" id="mainContent">
+
+  <!-- Card explicativa -->
+  <div>
+    <div class="info-card">
+      <h3><i class="fas fa-info-circle"></i> Sobre este formulario</h3>
+      <p>Este es el <b>formulario oficial</b> para el <b>registro de recolección de material reciclado</b>.</p>
+      <p>En él podrás registrar:</p>
+      <p><i class="fas fa-check-circle"></i> El <b>material recolectado</b>.</p>
+      <p><i class="fas fa-check-circle"></i> La <b>cantidad</b> en kilogramos.</p>
+      <p><i class="fas fa-check-circle"></i> La <b>persona u organización receptora</b>.</p>
+      <p><i class="fas fa-check-circle"></i> La <b>persona responsable del registro</b>.</p>
+      <p>🌍 ¡Gracias por contribuir a una comunidad <b>más limpia y sostenible</b>!</p>
+    </div>
+
+    <!-- GIF debajo de la card -->
+    <div class="gif-container">
+      <img src="https://i.gifer.com/7efs.gif" alt="Reciclaje animado"/>
+    </div>
+  </div>
+
+  <!-- Formulario -->
+  <div class="form-container active">
+    <h2>Formulario de Registro de Recolección</h2>
+    <form id="recoleccionForm">
+
+      <div class="campo">
+        <label for="material">♻️ Selecciona un material:</label>
+        <select id="material" name="material" required>
+          <option value="" disabled selected>Selecciona un material</option>
+          <option value="Plástico">Plástico</option>
+          <option value="Vidrio">Vidrio</option>
+          <option value="Papel y cartón">Papel y cartón</option>
+          <option value="Metales">Metales</option>
+        </select>
+      </div>
+
+      <div class="campo">
+        <label for="cantidad">⚖️ Cantidad reciclada (kg):</label>
+        <input type="number" id="cantidad" name="cantidad" min="1" step="0.1" required>
+      </div>
+
+      <div class="campo">
+        <label for="entrega">📍 ¿A quién se entregará el material?</label>
+        <input type="text" id="entrega" name="entrega" placeholder="Ejemplo: Cooperativa Verde Esperanza" required>
+      </div>
+
+      <div class="campo">
+        <label for="registrado">👤 Registrado por:</label>
+        <input type="text" id="registrado" name="registrado" placeholder="Nombre de quien registra" required>
+      </div>
+
+      <div class="campo">
+        <label for="fecha">📅 Fecha de recolección:</label>
+        <input type="date" id="fecha" name="fecha" required>
+      </div>
+
+      <button type="submit">✅ Registrar Recolección</button>
+    </form>
+  </div>
+
+</main>
+{% include 'residente/footer.html' %}
+<script>
+// Sidebar toggle
+const openSidebarBtn = document.getElementById('openSidebar');
+const closeSidebarBtn = document.getElementById('closeSidebar');
+const sidebar = document.getElementById('sidebar');
+const mainContent = document.getElementById('mainContent');
+
+function openSidebar() { sidebar.classList.add('active'); mainContent.style.transform = 'translateX(260px)'; }
+function closeSidebar() { sidebar.classList.remove('active'); mainContent.style.transform = 'translateX(0)'; }
+
+openSidebarBtn.addEventListener('click', () => { sidebar.classList.contains('active') ? closeSidebar() : openSidebar(); });
+if(closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+
+// Submenú toggle
+document.querySelectorAll('.submenu-toggle').forEach(toggle => {
+    toggle.addEventListener('click', (e) => { e.preventDefault(); e.stopPropagation(); toggle.parentElement.classList.toggle('active'); });
+});
+
+// Enlaces normales cierran el sidebar
+sidebar.querySelectorAll('a').forEach(a => { if(!a.classList.contains('submenu-toggle')) a.addEventListener('click', closeSidebar); });
+
+// Escape cierra menú
+document.addEventListener('keydown', (e) => { if(e.key==='Escape' && sidebar.classList.contains('active')) closeSidebar(); });
+
+// Demo submit
+document.getElementById('recoleccionForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    alert('Registro guardado (simulado).');
+    this.reset();
+});
+document.querySelectorAll('.submenu-toggle').forEach(toggle => {
+  const parent = toggle.parentElement; // li.submenu-parent
+  const submenu = parent.querySelector('.submenu');
+
+  toggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation(); // evita que el clic cierre otro menú
+    submenu.classList.toggle('active'); // solo alterna la visibilidad de este submenú
+  });
+});
+
+// Cerrar submenús si se hace clic fuera
+document.addEventListener('click', (e) => {
+  document.querySelectorAll('.submenu.active').forEach(sm => {
+    if (!sm.parentElement.contains(e.target)) {
+      sm.classList.remove('active');
+    }
+  });
+});
+
+</script>
+
+{% endblock %}

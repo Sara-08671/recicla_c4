@@ -1,0 +1,152 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear cuenta</title>
+
+    <style>
+        :root {
+            --green-dark: #1b4332;   
+            --green-medium: #2e7d32; 
+            --green-bright: #388e3c; 
+            --green-light: #66bb6a;  
+            --green-bg: #dcedc1;     
+            --green-bg-light: #a8e6cf;
+            --text-dark: #2f4f4f;
+            --white: #ffffff;
+            --border-color: #c8e6c9;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(120deg, var(--green-bg-light), var(--green-bg));
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .card {
+            width: 380px;
+            background: var(--white);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 6px 20px #0002;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--green-dark);
+            font-size: 24px;
+        }
+
+        label {
+            font-weight: bold;
+            color: var(--text-dark);
+            margin-top: 15px;
+            display: block;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: #fafffa;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: var(--green-medium);
+            border: none;
+            color: white;
+            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
+
+        button:hover {
+            background: var(--green-dark);
+        }
+
+        p.error {
+            color: red;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .login-link {
+            text-align: center;
+            margin-top: 15px;
+        }
+
+        .login-link a {
+            color: var(--green-bright);
+            font-weight: bold;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="card">
+
+    <h2>Crear cuenta</h2>
+
+    <form method="POST" action="{% url 'register' %}">
+        {% csrf_token %}
+
+        <label>Nombre</label>
+        <input type="text" name="nombre" required>
+
+        <label>Apellido</label>
+        <input type="text" name="apellido" required>
+
+        <label>Correo</label>
+        <input type="email" name="correo" required>
+
+        <label>Contraseña</label>
+        <input type="password" name="contrasena" required minlength="8" placeholder="Mínimo 8 caracteres">
+        <p style="font-size: 0.8rem; color: #666; margin-top: -10px; margin-bottom: 15px;">Mínimo 8 caracteres (letras, números, símbolos)</p>
+
+        <label>Fecha de nacimiento</label>
+        <input type="date" name="fecha_nacimiento">
+
+        <label>Barrio</label>
+        <input type="text" name="barrio">
+
+        <label>Rol</label>
+        <select name="rol" required>
+            <option value="residente">Residente</option>
+            <option value="organizador">Organizador</option>
+            <option value="administrador">Administrador</option>
+        </select>
+
+        <!-- ✔️ MESSAGES DENTRO DEL FORMULARIO -->
+        {% if messages %}
+            {% for message in messages %}
+                <p class="error">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <button type="submit">Crear cuenta</button>
+
+    </form>
+
+    <div class="login-link">
+        ¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión</a>
+    </div>
+
+</div>
+
+</body>
+</html>

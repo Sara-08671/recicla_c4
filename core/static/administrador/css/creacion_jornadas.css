@@ -1,0 +1,129 @@
+/* ============================
+   FORMULARIO DE CREACIÓN DE JORNADAS (V2)
+   ============================ */
+
+/* Contenedor general */
+.wrapper {
+    display: grid;
+    grid-template-columns: 0.9fr 1.4fr;
+    gap: 40px;
+    margin-top: 30px;
+}
+
+/* ============================
+   PANEL IZQUIERDO (más compacto)
+   ============================ */
+.left-panel {
+    background: linear-gradient(180deg, var(--bg-2), #ffffff);
+    padding: 20px 22px;
+    border-radius: var(--radius);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+    max-height: 350px;          /* 🔥 YA NO ES ALARGADO */
+    overflow: hidden;
+}
+
+.left-panel .titulo {
+    font-size: 1.7rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--secondary);
+}
+
+.left-panel .descripcion {
+    font-size: 1rem;
+    color: var(--muted);
+    line-height: 1.55;
+}
+
+/* ============================
+   FORMULARIO TIPO "BALCÓN"
+   ============================ */
+form {
+    background: white;  /* Blanco para que destaque */
+    padding: 32px;
+    border-radius: var(--radius);
+
+    /* 🎉 BALCÓN: Elevado, flotante */
+    box-shadow: 
+        0 12px 28px rgba(0,0,0,0.12),
+        0 4px 12px rgba(0,0,0,0.05);
+    position: relative;
+    z-index: 5;
+}
+
+form h2 {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 18px;
+}
+
+/* Campos */
+.campo {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 16px;
+}
+
+.campo.full {
+    grid-column: span 2;
+}
+
+label {
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--dark);
+}
+
+input, select, textarea {
+    padding: 10px 12px;
+    border: 2px solid rgba(46, 204, 113, 0.3);
+    border-radius: var(--radius);
+    background: white;
+    color: var(--dark);
+    font-size: 1rem;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--primary);
+    outline: none;
+    box-shadow: 0 0 8px rgba(46, 204, 113, 0.35);
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Botón */
+button[type="submit"] {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border-radius: 30px;
+    cursor: pointer;
+    width: 100%;
+    transition: transform 0.2s ease, background 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    transform: translateY(-3px);
+    background: var(--secondary);
+}
+
+/* Responsivo */
+@media (max-width: 900px) {
+    .wrapper {
+        grid-template-columns: 1fr;
+    }
+
+    .left-panel {
+        max-height: none;
+    }
+}

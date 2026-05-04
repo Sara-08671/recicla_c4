@@ -1,0 +1,83 @@
+{% extends "residente/base.html" %}
+{% load static %}
+
+{% block titulo %}Cambiar Foto{% endblock %}
+
+{% block cuerpo %}
+
+<style>
+    .page-container {
+        max-width: 450px;
+        margin: 40px auto;
+        padding: 20px;
+        background: #ffffff;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-radius: 12px;
+        text-align: center;
+    }
+
+    .page-container h2 {
+        margin-bottom: 20px;
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .perfil-foto {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid #009688;
+        margin-bottom: 15px;
+    }
+
+    /* Botón del file input (oculto para no dañar clicks) */
+    #id_foto {
+        display: block;
+        margin: 15px auto;
+    }
+
+    .btn-submit {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        margin-top: 15px;
+        background-color: #009688;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: 0.3s;
+        font-size: 16px;
+    }
+
+    .btn-submit:hover {
+        background-color: #00796B;
+    }
+</style>
+
+
+<div class="page-container">
+    <h2>Cambiar Foto de Perfil</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <!-- Imagen actual -->
+        {% if usuario.foto %}
+            <img src="{{ usuario.foto.url }}" alt="Foto de perfil" class="perfil-foto">
+        {% else %}
+            <img src="{% static 'residente/img/default-avatar.png' %}" alt="Foto de perfil" class="perfil-foto">
+        {% endif %}
+
+        <!-- Input file visible y clickeable -->
+        <input type="file" id="id_foto" name="foto" accept="image/*" required>
+
+        <button type="submit" class="btn-submit">Actualizar Foto</button>
+    </form>
+
+    <a href="{% url 'perfil_residente' %}" class="btn-submit">Volver al Perfil</a>
+</div>
+
+{% endblock %}

@@ -1,0 +1,205 @@
+{% extends "administrador/base.html" %}
+{% load static %}
+
+{% block titulo %}Historial de Puntaje{% endblock %}
+
+{% block cabeza_extra %}
+<link rel="stylesheet" href="{% static 'administrador/css/estilos.css' %}">
+<style>
+/* ===== Historial de Puntaje ===== */
+.page-container {
+    max-width: 1100px;
+    margin: 92px auto 60px;
+    padding: 20px;
+}
+
+.page-container h2 {
+    font-size: 26px;
+    font-weight: 700;
+    color: var(--dark);
+    margin-bottom: 20px;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.users-table th {
+    background: var(--primary);
+    color: #fff;
+    padding: 12px;
+    text-align: left;
+}
+
+.users-table td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    color: var(--dark);
+}
+
+.users-table tr:nth-child(even) {
+    background: var(--bg-1);
+}
+
+.users-table tr:last-child td {
+    border-bottom: none;
+}
+
+.btn-back {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 16px;
+    background: var(--light);
+    color: var(--dark);
+    font-weight: 600;
+    border-radius: var(--radius);
+    text-decoration: none;
+    transition: 0.25s;
+}
+
+.btn-back:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+/* Formulario para asignar nuevo puntaje */
+form {
+    background: #fff;
+    padding: 22px;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.08);
+    max-width: 480px;
+    margin: 30px auto;
+}
+
+form label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: var(--muted);
+}
+
+form input,
+form select {
+    width: 100%;
+    padding: 12px;
+    border-radius: var(--radius);
+    border: 1px solid #ccc;
+    margin-bottom: 16px;
+    transition: 0.25s;
+}
+
+form input:focus,
+form select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 6px rgba(46, 204, 113, 0.35);
+    outline: none;
+}
+
+/* Botón Asignar puntos */
+form button.btn {
+    width: 100%;
+    background: var(--primary);
+    color: white;
+    padding: 12px;
+    font-weight: 600;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+form button.btn:hover {
+    background: var(--secondary);
+    transform: translateY(-2px);
+}
+
+/* Paginación */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 18px;
+    gap: 8px;
+    font-family: Arial, sans-serif;
+}
+
+.pagination a {
+    padding: 6px 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--primary);
+    transition: 0.3s;
+}
+
+.pagination a:hover {
+    background: var(--primary);
+    color: white;
+}
+
+.pagination span {
+    padding: 6px 12px;
+    border-radius: 6px;
+    background: var(--primary);
+    color: white;
+    font-weight: bold;
+}
+</style>
+{% endblock %}
+
+{% block cuerpo %}
+{% include 'administrador/header.html' %}
+
+<div class="page-container">
+    <h2>Puntaje de {{ usuario.nombre }} {{ usuario.apellido }}</h2>
+
+    <table class="users-table">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Puntos</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in puntajes %}
+            <tr>
+                <td>{{ p.fecha|date:"d/m/Y H:i" }}</td>
+                <td>{{ p.puntos }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="2" class="no-data">No hay puntajes registrados.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Paginación -->
+    <div class="pagination">
+        {% if puntajes.has_previous %}
+            <a href="?page={{ puntajes.previous_page_number }}">« Anterior</a>
+        {% endif %}
+        <span>Página {{ puntajes.number }} de {{ puntajes.paginator.num_pages }}</span>
+        {% if puntajes.has_next %}
+            <a href="?page={{ puntajes.next_page_number }}">Siguiente »</a>
+        {% endif %}
+    </div>
+
+    <a href="{% url 'panel_usuarios' %}" class="btn-back">⬅️ Volver al Panel de Usuarios</a>
+
+    <h3 style="margin-top:40px; text-align:center;">Asignar nuevo puntaje</h3>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="{{ form.puntos.id_for_label }}">Puntos:</label>
+        {{ form.puntos }}
+        <button type="submit" class="btn">Asignar puntos</button>
+    </form>
+</div>
+
+{% include 'administrador/footer.html' %}
+{% endblock %}

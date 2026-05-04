@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Acceso Restringido</title>
+
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #e8f5e9; /* verde suave */
+        font-family: "Poppins", sans-serif;
+    }
+
+    .box {
+        width: 420px;
+        padding: 45px;
+        background: #ffffff;
+        border-radius: 20px;
+        box-shadow: 0px 10px 30px rgba(0,0,0,0.15);
+        text-align: center;
+        animation: fade .4s ease;
+    }
+
+    h1 {
+        font-size: 28px;
+        font-weight: 600;
+        color: #2e7d32;
+        margin-bottom: 15px;
+    }
+
+    p {
+        font-size: 16px;
+        color: #4f4f4f;
+        margin-bottom: 30px;
+    }
+
+    a.btn {
+        padding: 13px 28px;
+        background: #2e7d32;
+        color: white;
+        text-decoration: none;
+        border-radius: 10px;
+        font-weight: 600;
+        transition: .25s;
+    }
+
+    a.btn:hover {
+        background: #1b5e20;
+    }
+
+    @keyframes fade {
+        from {opacity: 0; transform: scale(.95);}
+        to {opacity: 1; transform: scale(1);}
+    }
+</style>
+</head>
+
+<body>
+
+<div class="box">
+    <h1>Debes iniciar sesión</h1>
+    <p>Para acceder aquí, primero ingresa a tu cuenta.</p>
+    <a href="/login/" class="btn">Iniciar sesión</a>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,67 @@
+html, body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    position: relative; /* importante para hojas absolutas */
+}
+
+.page-container {
+    flex: 1 0 auto; /* crece para llenar el espacio disponible */
+}
+
+
+/* ---------- Contenido ---------- */
+.page-container {
+    max-width: 1100px; margin: 92px auto 60px; padding:0 20px;
+    transition: transform 0.32s ease;
+    text-align: center;
+}
+
+/* ---------- Hero / Cómo funciona ---------- */
+h1.main-title { font-size:2.8rem; margin-bottom:12px; animation: fadeInDown 1s ease forwards; }
+p.main-desc { font-size:1.1rem; color: var(--muted); margin-bottom:40px; animation: fadeInUp 1s ease forwards; }
+
+@keyframes fadeInUp { from {opacity:0; transform: translateY(30px);} to {opacity:1; transform: translateY(0);} }
+@keyframes fadeInDown { from {opacity:0; transform: translateY(-30px);} to {opacity:1; transform: translateY(0);} }
+
+/* ---------- Pasos ---------- */
+.steps { display:grid; grid-template-columns: repeat(auto-fit,minmax(220px,1fr)); gap:24px; margin-top:40px; }
+.step-card { background:white; border-radius: var(--radius); padding:24px; box-shadow: 0 12px 24px rgba(0,0,0,0.08); position:relative; overflow:hidden; cursor:pointer; transition: transform 0.3s ease, box-shadow 0.3s ease; }
+.step-card:hover { transform: translateY(-6px); box-shadow: 0 18px 32px rgba(0,0,0,0.12); }
+.step-icon { font-size:36px; color: var(--primary); margin-bottom:12px; transition: transform 0.3s ease; }
+.step-card:hover .step-icon { transform: rotate(15deg) scale(1.2); }
+.step-number { width:44px; height:44px; border-radius:50%; background: var(--secondary); color:white; display:grid; place-items:center; font-weight:700; margin:0 auto 12px; }
+.step-title { font-size:1.1rem; font-weight:600; margin-bottom:8px; }
+.step-desc { font-size:0.95rem; color: var(--muted); }
+
+/* ---------- Barra de progreso ---------- */
+.progress-container { width: 80%; max-width: 700px; margin: 50px auto 0; height:8px; background: rgba(0,0,0,0.08); border-radius:4px; overflow:hidden; }
+.progress-bar { width:0%; height:100%; background: var(--primary); transition: width 0.4s ease; }
+
+/* ---------- Botón ---------- */
+.btn-join { display:inline-block; margin-top:40px; background: var(--primary); color:white; padding:12px 28px; border-radius:30px; text-decoration:none; font-weight:700; font-size:1rem; transition: transform 0.3s ease, background 0.3s ease; }
+.btn-join:hover { transform: scale(1.05); background: var(--secondary); }
+
+/* ---------- Fondo animado ---------- */
+.leaf { position:absolute; width:24px; height:24px; background: var(--primary); border-radius:50%; opacity:0.6; animation: floatLeaf 6s linear infinite; }
+@keyframes floatLeaf {
+    0% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-30px) rotate(180deg); }
+    100% { transform: translateY(0) rotate(360deg); }
+}
+
+.page-container {
+    position: relative; /* hace que las hojas se posicionen dentro de main */
+}
+
+.leaf {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background: var(--primary);
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: floatLeaf 6s linear infinite;
+    z-index: 10; /* sobre contenido de main, pero debajo de header si quieres */
+}
+

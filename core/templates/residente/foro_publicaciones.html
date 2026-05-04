@@ -1,0 +1,495 @@
+{% extends "residente/base.html" %}
+{% load static %}
+
+{% block cabeza_extra %}
+<link rel="stylesheet" href="{% static 'residente/css/estilos_residentes.css' %}">
+<link rel="stylesheet" href="{% static 'residente/css/publicacion_foro.css' %}">
+<style>
+    /* ====== ESTILOS DE LOS BOTONES DE INTERACCIÓN ====== */
+
+    .foro-actions {
+        margin-top: 15px;
+        padding: 12px;
+        background: #f8f8f8;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        border: 1px solid #e0e0e0;
+        margin-bottom: 80px;
+    }
+
+    .foro-reacciones button,
+    .foro-otros button {
+        padding: 8px 14px;
+        border: none;
+        border-radius: 6px;
+        margin-right: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: 0.2s ease;
+    }
+
+    .btn-like {
+        background: #e1f3ff;
+    }
+    .btn-like:hover {
+        background: #c8e7ff;
+    }
+    .btn-like.active {
+        background: #2196F3;
+        color: white;
+    }
+
+    .btn-dislike {
+        background: #ffe3e3;
+    }
+    .btn-dislike:hover {
+        background: #ffc7c7;
+    }
+    .btn-dislike.active {
+        background: #f44336;
+        color: white;
+    }
+
+    .btn-love {
+        background: #ffe2f0;
+    }
+    .btn-love:hover {
+        background: #ffc8e2;
+    }
+    .btn-love.active {
+        background: #E91E63;
+        color: white;
+    }
+
+    .btn-comentar {
+        background: #f2f2f2;
+    }
+    .btn-comentar:hover {
+        background: #e0e0e0;
+    }
+
+    .btn-denunciar {
+        background: #ffeacc;
+        color: #b33a00;
+        font-weight: bold;
+    }
+    .btn-denunciar:hover {
+        background: #ffd8a1;
+    }
+
+    /* Contadores de reacciones */
+    .reaction-counts {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 10px;
+        font-size: 13px;
+        color: #666;
+    }
+    .reaction-counts span {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    /* Sección de comentarios */
+    .comentarios-seccion {
+        margin-top: 15px;
+        padding: 15px;
+        background: #fafafa;
+        border-radius: 8px;
+        display: none;
+    }
+    .comentarios-seccion.mostrar {
+        display: block;
+    }
+    .comentario-item {
+        padding: 10px;
+        background: white;
+        border-radius: 6px;
+        margin-bottom: 8px;
+        border: 1px solid #eee;
+    }
+    .comentario-autor {
+        font-weight: bold;
+        color: #333;
+        font-size: 13px;
+    }
+    .comentario-fecha {
+        color: #999;
+        font-size: 11px;
+        margin-left: 8px;
+    }
+    .comentario-texto {
+        margin-top: 5px;
+        color: #555;
+    }
+    .comentario-form {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    .comentario-form input {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+    }
+    .comentario-form button {
+        padding: 8px 16px;
+        background: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    /* Modal para denunciar */
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+    .modal-overlay.mostrar {
+        display: flex;
+    }
+    .modal-content {
+        background: white;
+        padding: 25px;
+        border-radius: 12px;
+        max-width: 400px;
+        width: 90%;
+    }
+    .modal-content h3 {
+        margin-top: 0;
+        color: #333;
+    }
+    .modal-content textarea {
+        width: 100%;
+        height: 100px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        margin: 15px 0;
+        resize: vertical;
+    }
+    .modal-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+    }
+    .modal-buttons button {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+    .btn-cancelar {
+        background: #e0e0e0;
+        color: #333;
+    }
+    .btn-enviar-denuncia {
+        background: #f44336;
+        color: white;
+    }
+
+    /* Notificación flotante */
+    .foro-notificacion {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        border-radius: 8px;
+        color: white;
+        font-weight: bold;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+        z-index: 2000;
+    }
+    .foro-notificacion.mostrar {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .foro-notificacion.tipo-success {
+        background: #4CAF50;
+    }
+    .foro-notificacion.tipo-error {
+        background: #f44336;
+    }
+</style>
+
+
+{% endblock %}
+{% block cuerpo %}
+
+
+{% include "residente/header.html" %}
+
+<main class="page-container foro-page">
+
+    <section class="foro-hero">
+        <h1>💬 Foro Comunitario</h1>
+        <p>Publicaciones realizadas por los administradores y organizadores de la Comuna 4.</p>
+    </section>
+
+    <section class="foro-lista">
+        {% if publicaciones %}
+            {% for pub in publicaciones %}
+            <div class="foro-card" data-tema-id="{{ pub.id_tema }}">
+                <h3>{{ pub.titulo }}</h3>
+
+                <p class="foro-contenido">
+                    {{ pub.contenido|linebreaksbr }}
+                </p>
+
+                <div class="foro-footer">
+                    <span>👤 {{ pub.id_usuario.nombre }} {{ pub.id_usuario.apellido }}</span>
+                    <span>📅 {{ pub.fecha_publicacion|date:"d/m/Y H:i" }}</span>
+                </div>
+
+                <!-- Contadores de reacciones -->
+                <div class="reaction-counts">
+                    <span>👍 {{ pub.total_me_gusta|default:0 }}</span>
+                    <span>👎 {{ pub.total_no_me_gusta|default:0 }}</span>
+                    <span>❤️ {{ pub.total_me_encanta|default:0 }}</span>
+                </div>
+            </div>
+
+            <!-- 🔽 Botones por FUERA de la tarjeta -->
+            <div class="foro-actions">
+
+                <div class="foro-reacciones">
+                    <button class="btn-like" data-tema-id="{{ pub.id_tema }}" data-tipo="me_gusta">👍 Me gusta</button>
+                    <button class="btn-dislike" data-tema-id="{{ pub.id_tema }}" data-tipo="no_me_gusta">👎 No me gusta</button>
+                    <button class="btn-love" data-tema-id="{{ pub.id_tema }}" data-tipo="me_encanta">❤️ Me encanta</button>
+                </div>
+
+                <div class="foro-otros">
+                    <button class="btn-comentar-toggle" data-tema-id="{{ pub.id_tema }}">💬 Comentar</button>
+                    <button class="btn-denunciar-toggle" data-tema-id="{{ pub.id_tema }}">🚫 Denunciar contenido</button>
+                </div>
+
+            </div>
+
+            <!-- Sección de comentarios -->
+            <div class="comentarios-seccion" id="comentarios-{{ pub.id_tema }}">
+                <h4>Comentarios</h4>
+                <div class="comentarios-lista" id="comentarios-lista-{{ pub.id_tema }}">
+                    {% for comentario in pub.comentarios.all %}
+                    <div class="comentario-item">
+                        <span class="comentario-autor">{{ comentario.autor.nombre }} {{ comentario.autor.apellido }}</span>
+                        <span class="comentario-fecha">{{ comentario.fecha_creacion|date:"d/m/Y H:i" }}</span>
+                        <div class="comentario-texto">{{ comentario.contenido }}</div>
+                    </div>
+                    {% empty %}
+                    <p class="no-comentarios">No hay comentarios aún. ¡Sé el primero en comentar!</p>
+                    {% endfor %}
+                </div>
+                <div class="comentario-form">
+                    <input type="text" id="comentario-input-{{ pub.id_tema }}" placeholder="Escribe un comentario...">
+                    <button onclick="enviarComentario({{ pub.id_tema }})">Enviar</button>
+                </div>
+            </div>
+
+            {% endfor %}
+        {% else %}
+            <p class="no-pub">No hay publicaciones en el foro.</p>
+        {% endif %}
+    </section>
+
+</main>
+
+<!-- Modal para denunciar -->
+<div class="modal-overlay" id="modal-denuncia">
+    <div class="modal-content">
+        <h3>🚫 Denunciar contenido</h3>
+        <p>¿Por qué deseas denunciar esta publicación?</p>
+        <textarea id="denuncia-motivo" placeholder="Explica el motivo de tu denuncia..."></textarea>
+        <input type="hidden" id="denuncia-tema-id">
+        <div class="modal-buttons">
+            <button class="btn-cancelar" onclick="cerrarModalDenuncia()">Cancelar</button>
+            <button class="btn-enviar-denuncia" onclick="enviarDenuncia()">Denunciar</button>
+        </div>
+    </div>
+</div>
+
+<!-- Mensaje flotante para notificaciones -->
+<div id="foro-notificacion" class="foro-notificacion"></div>
+
+<script>
+    // Función para reaccionar
+    document.querySelectorAll('.btn-like, .btn-dislike, .btn-love').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const temaId = this.getAttribute('data-tema-id');
+            const tipo = this.getAttribute('data-tipo');
+            
+            fetch(`/foro/reaccionar/${temaId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({tipo: tipo})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    mostrarNotificacion(data.error, 'error');
+                } else {
+                    location.reload();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                mostrarNotificacion('Error al procesar la reacción', 'error');
+            });
+        });
+    });
+
+    // Toggle comentarios
+    document.querySelectorAll('.btn-comentar-toggle').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const temaId = this.getAttribute('data-tema-id');
+            const seccion = document.getElementById(`comentarios-${temaId}`);
+            seccion.classList.toggle('mostrar');
+        });
+    });
+
+    // Abrir modal de denuncia
+    document.querySelectorAll('.btn-denunciar-toggle').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const temaId = this.getAttribute('data-tema-id');
+            document.getElementById('denuncia-tema-id').value = temaId;
+            document.getElementById('modal-denuncia').classList.add('mostrar');
+        });
+    });
+
+    // Cerrar modal de denuncia
+    function cerrarModalDenuncia() {
+        document.getElementById('modal-denuncia').classList.remove('mostrar');
+        document.getElementById('denuncia-motivo').value = '';
+    }
+
+    // Enviar denuncia
+    function enviarDenuncia() {
+        const temaId = document.getElementById('denuncia-tema-id').value;
+        const motivo = document.getElementById('denuncia-motivo').value;
+
+        if (!motivo.trim()) {
+            mostrarNotificacion('Por favor, ingresa un motivo para la denuncia', 'error');
+            return;
+        }
+
+        fetch(`/foro/denunciar/${temaId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({motivo: motivo})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                mostrarNotificacion(data.error, 'error');
+            } else {
+                mostrarNotificacion(data.mensaje, 'success');
+                cerrarModalDenuncia();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarNotificacion('Error al enviar la denuncia', 'error');
+        });
+    }
+
+    // Enviar comentario
+    function enviarComentario(temaId) {
+        const input = document.getElementById(`comentario-input-${temaId}`);
+        const contenido = input.value;
+
+        if (!contenido.trim()) {
+            mostrarNotificacion('Por favor, escribe un comentario', 'error');
+            return;
+        }
+
+        fetch(`/foro/comentar/${temaId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({contenido: contenido})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                mostrarNotificacion(data.error, 'error');
+            } else {
+                const lista = document.getElementById(`comentarios-lista-${temaId}`);
+                const noComentarios = lista.querySelector('.no-comentarios');
+                if (noComentarios) {
+                    noComentarios.remove();
+                }
+
+                const nuevoComentario = document.createElement('div');
+                nuevoComentario.className = 'comentario-item';
+                nuevoComentario.innerHTML = `
+                    <span class="comentario-autor">${data.autor}</span>
+                    <span class="comentario-fecha">${data.fecha}</span>
+                    <div class="comentario-texto">${data.contenido}</div>
+                `;
+                lista.appendChild(nuevoComentario);
+
+                input.value = '';
+                mostrarNotificacion('Comentario agregado', 'success');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            mostrarNotificacion('Error al enviar el comentario', 'error');
+        });
+    }
+
+    // Función para obtener cookie CSRF
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Función para mostrar notificaciones
+    function mostrarNotificacion(mensaje, tipo) {
+        const notificacion = document.getElementById('foro-notificacion');
+        notificacion.textContent = mensaje;
+        notificacion.className = `foro-notificacion tipo-${tipo} mostrar`;
+        
+        setTimeout(() => {
+            notificacion.classList.remove('mostrar');
+        }, 3000);
+    }
+</script>
+
+
+{% include "residente/footer.html" %}
+
+{% endblock %}

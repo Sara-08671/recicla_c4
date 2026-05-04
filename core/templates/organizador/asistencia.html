@@ -1,0 +1,142 @@
+{% extends "organizador/base.html" %}
+{% load static %}
+{% block titulo %}Acciones Destacadas{% endblock %}
+
+{% block cabeza_extra %}
+<link rel="stylesheet" href="{% static 'organizador/css/estilos.css' %}">
+<style>
+  .page-title { font-size: 2rem; font-weight: 700; color: var(--dark); margin-bottom: 24px; padding-top: 20px; }
+  .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  .card h2 { font-size: 1.2rem; font-weight: 600; color: var(--dark); margin-bottom: 16px; }
+  select { width: 100%; padding: 10px 14px; border: 2px solid rgba(46,204,113,0.3); border-radius: 8px; font-size: 1rem; color: var(--dark); background: white; }
+  .tabla-acciones { width: 100%; border-collapse: collapse; margin-top: 16px; }
+  .tabla-acciones th { background: var(--bg-2, #f5f5f5); padding: 12px 10px; text-align: left; font-weight: 600; color: var(--dark); }
+  .tabla-acciones td { padding: 12px 10px; border-bottom: 1px solid #eee; color: var(--dark); }
+  .campo-input { width: 100%; padding: 6px 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.9rem; }
+  .btn-guardar { margin-top: 20px; background: var(--primary, #27ae60); color: white; border: none; padding: 12px 28px; border-radius: 30px; cursor: pointer; font-size: 1rem; font-weight: 600; }
+  .btn-guardar:hover { background: var(--secondary); transform: translateY(-2px); }
+  .info { color: #888; font-size: 13px; padding: 8px 12px; background: #f9f9f9; border-radius: 6px; border-left: 3px solid #27ae60; margin-bottom: 12px; }
+</style>
+{% endblock %}
+
+{% block cuerpo %}
+{% include 'organizador/header.html' %}
+
+<main class="page-container">
+  <div class="wrapper">
+    <div class="form-container">
+      <h1 class="page-title">Registro de Acciones Destacadas</h1>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div style="padding:12px 16px; border-radius:8px; margin-bottom:16px;
+              background:{% if message.tags == 'error' %}#fdecea{% else %}#e8f5e9{% endif %};
+              color:{% if message.tags == 'error' %}#c0392b{% else %}#27ae60{% endif %};
+              border:1px solid {% if message.tags == 'error' %}#f5c6cb{% else %}#a3d9a5{% endif %};">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <div class="card">
+        <h2>Selecciona una jornada finalizada</h2>
+        <form method="GET" action="{% url 'organizador_asistencia' %}">
+          <select name="jornada_id" required onchange="this.form.submit()">
+            <option value="">-- Selecciona jornada --</option>
+            {% for j in jornadas_finalizadas %}
+              <option value="{{ j.id_jornada }}"
+                {% if jornada and jornada.id_jornada == j.id_jornada %}selected{% endif %}>
+                {{ j.titulo }} — {{ j.fecha }}
+              </option>
+            {% endfor %}
+          </select>
+        </form>
+      </div>
+
+      {% if jornada %}
+      <form method="POST" action="{% url 'organizador_asistencia' %}">
+        {% csrf_token %}
+        <input type="hidden" name="jornada_id" value="{{ jornada.id_jornada }}">
+
+        <div class="card">
+          <h2>Inscritos en: {{ jornada.titulo }}</h2>
+          <p class="info">
+            Registra acciones destacadas por usuario. El administrador las validara y asignara puntos adicionales.
+          </p>
+
+          {% if inscripciones %}
+          <table class="tabla-acciones">
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Rol</th>
+                <th>Accion destacada</th>
+                <th>Puntos sugeridos</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for ins in inscripciones %}
+              <tr>
+                <td><strong>{{ ins.usuario.nombre }} {{ ins.usuario.apellido }}</strong></td>
+                <td>{{ ins.usuario.rol }}</td>
+                <td>
+                  <input type="text" class="campo-input"
+                    name="accion_{{ ins.id_inscripcion }}"
+                    placeholder="Describe la accion destacada...">
+                </td>
+                <td>
+                  <input type="number" class="campo-input"
+                    name="puntos_{{ ins.id_inscripcion }}"
+                    value="5" min="1" max="50"
+                    style="width:80px;">
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+
+          <button type="submit" class="btn-guardar">
+            Registrar Acciones Destacadas
+          </button>
+
+          {% else %}
+            <p style="color:#888;">No hay inscritos en esta jornada.</p>
+          {% endif %}
+        </div>
+      </form>
+      {% endif %}
+
+    </div>
+  </div>
+</main>
+
+{% include 'organizador/footer.html' %}
+<script>
+const openSidebarBtn = document.getElementById('openSidebar');
+const closeSidebarBtn = document.getElementById('closeSidebar');
+const sidebar = document.getElementById('sidebar');
+
+function openSidebar() { sidebar.classList.add('active'); }
+function closeSidebar() { sidebar.classList.remove('active'); }
+
+openSidebarBtn.addEventListener('click', () => {
+    sidebar.classList.contains('active') ? closeSidebar() : openSidebar();
+});
+if(closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+
+document.querySelectorAll('.submenu-toggle').forEach(toggle => {
+  const submenu = toggle.parentElement.querySelector('.submenu');
+  toggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    submenu.classList.toggle('active');
+  });
+});
+
+document.addEventListener('click', (e) => {
+  document.querySelectorAll('.submenu.active').forEach(sm => {
+    if (!sm.parentElement.contains(e.target)) sm.classList.remove('active');
+  });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,186 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recicla Comuna 4 — Cómo Funciona</title>
+ <link rel="stylesheet" href="{% static 'residente/css/estilos_residentes.css' %}">
+ <link rel="stylesheet" href="{% static 'residente/css/comofunciona.css' %}">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+    <!-- Sidebar -->
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar" aria-hidden="true">
+  <div class="close">
+    <button id="closeSidebar" aria-label="Cerrar menú">&times;</button>
+  </div>
+  <ul>
+    <li><a href="#beneficios">🔧 Configuración</a></li>
+    <li><a href="cat_recompensas.html">🎁 Recompensas</a></li>
+
+    <!-- 🔽 Submenú Jornadas -->
+    <li class="submenu-parent">
+      <a href="javascript:void(0);" class="submenu-toggle">
+        📅 Jornadas <i class="fas fa-chevron-down"></i>
+      </a>
+      <ul class="submenu">
+        <li><a href="#ver-jornadas">Ver Jornadas</a></li>
+        <li><a href="inscripcion.html">Inscribirse a Jornadas</a></li>
+        <li><a href="recoleccion.html">Registro de Recolección</a></li>
+      </ul>
+    </li>
+
+  </ul>
+</aside>
+
+<!--#endregion menu-hamburguesa-->
+
+<header>
+  <div class="header-left">
+      <button class="hamburger" id="openSidebar" aria-label="Abrir menú"><i class="fas fa-bars"></i></button>
+      <div class="logo">
+          <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(90deg,var(--primary),var(--secondary));display:grid;place-items:center;color:white;font-weight:800">♻</div>
+          <div>
+              <div style="font-size:16px">Recicla <span>Comuna 4</span></div>
+              <div style="font-size:11px;color:rgba(0,0,0,0.5)">Jornadas & Comunidad</div>
+          </div>
+      </div>
+  </div>
+  <div class="header-right">
+    <ul>
+    <li><a href="inicio.html">🏠 Inicio</a></li>
+    <li><a href="como-funciona.html">📝 Cómo funciona</a></li>
+    <li><a href="#beneficios">🌟 Educación</a></li>
+    <li class="submenu-parent">
+      <a href="javascript:void(0);" class="submenu-toggle">
+        💬 Foro <i class="fas fa-chevron-down"></i>
+      </a>
+      <ul class="submenu">
+        <li><a href="publicacion_foro.html">Nueva Publicación</a></li>
+        <li><a href="publicaciones.html">Publicaciones</a></li>
+      </ul>
+    </li>
+    <li><a href="#contacto">✉️ Contacto</a></li>
+    </ul>
+        <a href="#perfil" class="btn-profile">Perfil <i class="fas fa-user-circle"></i></a>
+    </div>
+</header>
+<!-- Contenido -->
+<h1>{{ jornada.titulo }}</h1>
+<p>{{ jornada.descripcion }}</p>
+<p>Fecha: {{ jornada.fecha }} | Hora: {{ jornada.hora }}</p>
+<p>Dirección: {{ jornada.direccion }}</p>
+<p>Barrio: {{ jornada.barrio }}</p>
+
+<form method="post" action="{% url 'inscribirse_jornada' jornada.id %}">
+    {% csrf_token %}
+    <button type="submit">Inscribirse</button>
+</form>
+
+<footer>
+    <div class="footer-grid">
+        <div class="footer-col">
+            <h4>Recicla Comuna 4</h4>
+            <a href="inicio.html">Inicio</a>
+            <a href="como-funciona.html">Cómo Funciona</a>
+            <a href="#beneficios">Beneficios</a>
+        </div>
+        <div class="footer-col">
+            <h4>Comunidad</h4>
+            <a href="#testimonios">Testimonios</a>
+            <a href="#recompensas">Recompensas</a>
+            <a href="#registro">Registro</a>
+        </div>
+        <div class="footer-col">
+            <h4>Contacto</h4>
+            <a href="mailto:contacto@reciclacomuna4.com">✉ contacto@reciclacomuna4.com</a>
+            <a href="#">📞 +57 300 1234567</a>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+    </div>
+    <p>&copy; 2025 Recicla Comuna 4. Todos los derechos reservados.</p>
+</footer>
+
+<script>
+// Sidebar toggle
+const openSidebarBtn = document.getElementById('openSidebar');
+const closeSidebarBtn = document.getElementById('closeSidebar');
+const sidebar = document.getElementById('sidebar');
+const mainContent = document.getElementById('mainContent');
+
+function openSidebar() { sidebar.classList.add('active'); mainContent.style.transform = 'translateX(260px)'; }
+function closeSidebar() { sidebar.classList.remove('active'); mainContent.style.transform = 'translateX(0)'; }
+
+openSidebarBtn.addEventListener('click', () => sidebar.classList.contains('active') ? closeSidebar() : openSidebar());
+closeSidebarBtn.addEventListener('click', closeSidebar);
+
+document.addEventListener('keydown', e => { if(e.key==='Escape' && sidebar.classList.contains('active')) closeSidebar(); });
+
+// Scroll progress
+const progressBar = document.getElementById('progressBar');
+window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.body.scrollHeight - window.innerHeight;
+    progressBar.style.width = (scrollTop / docHeight * 100) + '%';
+});
+
+const mainContentEl = document.getElementById('mainContent');
+const joinBtn = mainContentEl.querySelector('.btn-join');
+
+for(let i=0; i<15; i++){
+    const leaf = document.createElement('div');
+    leaf.classList.add('leaf');
+    leaf.style.left = Math.random() * 100 + '%';
+    leaf.style.top = (joinBtn.offsetTop + joinBtn.offsetHeight + Math.random() * 50) + 'px'; // justo debajo del botón
+    leaf.style.width = 12 + Math.random() * 16 + 'px';
+    leaf.style.height = leaf.style.width;
+    leaf.style.animationDuration = 4 + Math.random() * 4 + 's';
+    mainContentEl.appendChild(leaf);
+}
+
+// Submenú toggle
+document.querySelectorAll('.submenu-toggle').forEach(toggle => {
+  toggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggle.parentElement.classList.toggle('active');
+  });
+});
+// Enlaces normales cierran el sidebar, pero NO los que son submenú
+sidebar.querySelectorAll('a').forEach(a => {
+  if(!a.classList.contains('submenu-toggle')) {
+    a.addEventListener('click', closeSidebar);
+  }
+});
+
+document.querySelectorAll('.submenu-toggle').forEach(toggle => {
+  const parent = toggle.parentElement; // li.submenu-parent
+  const submenu = parent.querySelector('.submenu');
+
+  toggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation(); // evita que el clic cierre otro menú
+    submenu.classList.toggle('active'); // solo alterna la visibilidad de este submenú
+  });
+});
+
+// Cerrar submenús si se hace clic fuera
+document.addEventListener('click', (e) => {
+  document.querySelectorAll('.submenu.active').forEach(sm => {
+    if (!sm.parentElement.contains(e.target)) {
+      sm.classList.remove('active');
+    }
+  });
+});
+
+</script>
+</body>
+</html>

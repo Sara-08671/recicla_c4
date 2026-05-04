@@ -1,0 +1,43 @@
+{% extends "usuario/base.html" %}
+
+{% block cuerpo %}
+<header>
+  <div class="header-left">
+      <div class="logo">
+          <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(90deg,var(--primary),var(--secondary));display:grid;place-items:center;color:white;font-weight:800">♻</div>
+          <div>
+              <div style="font-size:16px">Recicla <span>Comuna 4</span></div>
+              <div style="font-size:11px;color:rgba(0,0,0,0.5)">Jornadas & Comunidad</div>
+          </div>
+      </div>
+  </div>
+
+  <div class="header-right">
+    <ul>
+      <li><a href="{% url 'usuario_inicio' %}">🏠 Inicio</a></li>
+      <li><a href="{% url 'usuario_como_participar' %}">📝 Cómo participar</a></li>
+      <li><a href="{% url 'usuario_educacion' %}">🌟 Educación</a></li>
+
+      <li class="submenu-parent">
+        <a href="javascript:void(0);" class="submenu-toggle">
+          💬 Foro <i class="fas fa-chevron-down"></i>
+        </a>
+        <ul class="submenu">
+          <li><a href="{% url 'usuario_foro_publicaciones' %}">Publicaciones</a></li>
+        </ul>
+      </li>
+
+      <li><a href="{% url 'usuario_contacto' %}">✉️ Contacto</a></li>
+    </ul>
+
+    <a href="{% url 'login' %}" class="btn-profile">
+      Iniciar sesión <i class="fas fa-user-circle"></i>
+    </a>
+    <a href="{% url 'register' %}" class="btn-profile">
+      Registrarse <i class="fas fa-user-circle"></i>
+    </a>
+  </div>
+</header>
+
+
+{% endblock%}

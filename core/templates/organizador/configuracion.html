@@ -1,0 +1,115 @@
+{% extends "organizador/base.html" %}
+{% load static %}
+
+{% block titulo %}Configuración del administrador{% endblock %}
+
+{% block cuerpo %}
+<link rel="stylesheet" href="{% static 'organizador/css/estilos.css' %}">
+<link rel="stylesheet" href="{% static 'organizador/css/configuracion.css' %}">
+
+{% include 'organizador/header.html' %}
+
+<div class="page-container">
+
+    <h2 class="config-title">⚙️ Configuración de tu Cuenta</h2>
+
+    <div class="config-grid">
+
+        <!-- SECCIÓN 1: Perfil -->
+        <div class="config-card">
+            <h3>👤 Información Personal</h3>
+
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="perfil">
+
+                <label>Nombre completo</label>
+                <input type="text" name="nombre" value="{{ user.nombre }}" required>
+
+                <label>Correo electrónico</label>
+                <input type="email" name="email" value="{{ user.correo }}" required>
+
+                <label>Teléfono</label>
+                <input type="text" name="telefono" value="{{ user.telefono }}">
+
+                <button class="btn-save">Guardar cambios</button>
+            </form>
+        </div>
+
+        <!-- SECCIÓN 2: Notificaciones -->
+        <div class="config-card">
+            <h3>🔔 Notificaciones</h3>
+
+            <div class="toggle-row">
+                <span>Recibir avisos de jornadas</span>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+
+            <div class="toggle-row">
+                <span>Recordatorios de inscripciones</span>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+
+            <div class="toggle-row">
+                <span>Nuevas publicaciones en el foro</span>
+                <label class="switch">
+                    <input type="checkbox">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 3: Seguridad -->
+        <div class="config-card">
+            <h3>🔐 Seguridad</h3>
+
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="password">
+
+                <label>Contraseña actual</label>
+                <input type="password" name="password_actual" required>
+
+                <label>Nueva contraseña</label>
+                <input type="password" name="password_nueva" required>
+
+                <label>Confirmar nueva contraseña</label>
+                <input type="password" name="password_confirmacion" required>
+
+                <button class="btn-save">Actualizar contraseña</button>
+            </form>
+        </div>
+
+        <!-- SECCIÓN 4: Preferencias -->
+        <div class="config-card">
+            <h3>🌗 Preferencias</h3>
+
+            <div class="toggle-row">
+                <span>Modo oscuro</span>
+                <label class="switch">
+                    <input type="checkbox" id="darkModeToggle">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+
+            <div class="toggle-row">
+                <span>Mostrar mis logros en el perfil</span>
+                <label class="switch">
+                    <input type="checkbox" checked>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% include 'organizador/footer.html' %}
+{% endblock %}

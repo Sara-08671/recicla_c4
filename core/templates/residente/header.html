@@ -1,0 +1,70 @@
+{% extends "administrador/base.html" %}
+
+{% block cuerpo %}
+<!-- Sidebar -->
+<aside class="sidebar" id="sidebar" aria-hidden="true">
+  <div class="close">
+    <button id="closeSidebar" aria-label="Cerrar menú">&times;</button>
+  </div>
+  <ul>
+    <li><a href="{% url 'residente_configuracion' %}">🔧 Configuración</a></li>
+    <li><a href="{% url 'residente_notificaciones' %}">🔔 Notificaciones</a></li>
+    <li><a href="{% url 'residente_cat_recompensas' %}">🎁 Recompensas</a></li>
+
+    <!-- 🔽 Submenú Jornadas -->
+   <li class="submenu-parent">
+  <a href="javascript:void(0);" class="submenu-toggle">
+    📅 Jornadas <i class="fas fa-chevron-down"></i>
+  </a>
+  <ul class="submenu">
+    <li><a href="{% url 'residente_lista_jornadas' %}">Ver Jornadas</a></li>
+    <li><a href="{% url 'residente_recoleccion' %}">Registro de Recolección</a></li>
+  </ul>
+</li>
+
+  </ul>
+   <a href="{% url 'logout' %}">Cerrar sesión</a>
+</aside>
+
+<!--#endregion menu-hamburguesa-->
+
+<!--#region header-->
+<header>
+  <div class="header-left">
+      <button class="hamburger" id="openSidebar" aria-label="Abrir menú"><i class="fas fa-bars"></i></button>
+      <div class="logo">
+          <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(90deg,var(--primary),var(--secondary));display:grid;place-items:center;color:white;font-weight:800">♻</div>
+          <div>
+              <div style="font-size:16px">Recicla <span>Comuna 4</span></div>
+              <div style="font-size:11px;color:rgba(0,0,0,0.5)">Jornadas & Comunidad</div>
+          </div>
+      </div>
+  </div>
+  <div class="header-right">
+    <ul>
+    <li><a href="{% url 'residente_inicio' %}">🏠 Inicio</a></li>
+    <li><a href="{% url 'residente_como_participar' %}">📝 Cómo participar</a></li>
+    <li><a href="{% url 'residente_educacion' %}">🌟 Educación</a></li>
+    <li class="submenu-parent">
+      <a href="javascript:void(0);" class="submenu-toggle">
+        💬 Foro <i class="fas fa-chevron-down"></i>
+      </a>
+      <ul class="submenu">
+        <li><a href="{% url 'residente_publicacion_foro' %}">Nueva Publicación</a></li>
+        <li><a href="{% url 'residente_foro_publicaciones' %}">Publicaciones</a></li>
+      </ul>
+    </li>
+    <li><a href="{% url 'residente_contacto' %}">✉️ Contacto</a></li>
+    </ul>
+    
+<a href="{% url 'perfil_residente' %}" class="btn-profile">
+    Perfil <i class="fas fa-user-circle"></i>
+</a>
+
+      </div>
+
+    
+</header>
+<!--#endregion header-->
+
+{% endblock%}

@@ -1,0 +1,228 @@
+{% extends "administrador/base.html" %}
+{% load static %}
+{% block titulo %}Creación de Recompensas{% endblock %}
+
+{% block cabeza_extra %}
+   <link rel="stylesheet" href="{% static 'administrador/css/estilos.css' %}">
+    <link rel="stylesheet" href="{% static 'administrador/css/estilos recompensa.css' %}">
+{% endblock %}
+
+{% block cuerpo %}
+{% include 'administrador/header.html' %}
+
+
+<main>
+  <!-- WRAPPER DEL FORMULARIO -->
+  <div class="wrapper">
+    <!-- Panel izquierdo con información -->
+    <div class="left-panel">
+      <h1 class="titulo">🎁 Crear Recompensa</h1>
+      <p class="descripcion">
+        Este es el <strong>formulario oficial</strong> para la creación de recompensas.
+        Aquí podrás registrar el <strong>nombre</strong>, los <strong>puntos necesarios</strong>, la <strong>categoría</strong> y la <strong>descripción</strong> de cada recompensa.
+      </p>
+    </div>
+
+    <!-- Panel derecho con formulario -->
+    <div class="form-container">
+      <h2>Formulario de Recompensa</h2>
+      <form id="formRecompensa">
+        <div class="campo">
+          <label for="nombre">🏷️ Nombre de la recompensa:</label>
+          <input type="text" id="nombre" name="nombre" required>
+        </div>
+
+        <div class="campo">
+          <label for="costo">💰 Puntos necesarios:</label>
+          <input type="number" id="costo" name="costo" min="1" required>
+        </div>
+
+        <div class="campo">
+          <label for="categoria">📂 Categoría:</label>
+          <select id="categoria" name="categoria" required>
+            <option value="all">Todas las categorías</option>
+            <option value="Accesorios">Accesorios</option>
+            <option value="Hogar">Hogar</option>
+            <option value="Ropa">Ropa</option>
+            <option value="Herramientas">Herramientas</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="estado">Estado:</label>
+          <select id="estado" name="estado" required>
+            <option value="" disabled selected>Selecciona un estado</option>
+            <option value="activa">Activa</option>
+            <option value="inactiva">Inactiva</option>
+          </select>
+        </div>
+
+        <div class="campo">
+          <label for="descripcion">📝 Descripción:</label>
+          <textarea id="descripcion" name="descripcion" required></textarea>
+        </div>
+
+        <div style="justify-content:center;">
+          <button type="button" style="background:#ED4E4E; color:white;">❌ Cancelar</button>
+          <button type="submit">✅ Crear Recompensa</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- NUEVO WRAPPER PARA EL HISTORIAL -->
+  <div class="wrapper-historial">
+    <div class="form-container">
+      <button id="btnHistorial" style="margin-top:20px;">📜 Ver historial de recompensas</button>
+      <div id="historialRecompensas">
+        <h2>Historial de Recompensas</h2>
+        <ul id="listaRecompensas"></ul>
+      </div> 
+    </div>
+  </div>
+</main>
+
+
+
+
+{% include 'administrador/footer.html' %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const sidebar = document.getElementById('sidebar');
+  const openBtn = document.getElementById('openSidebar');
+  const closeBtn = document.getElementById('closeSidebar');
+  const overlay = document.getElementById('overlay');
+
+  const openSidebar = () => {
+    sidebar?.classList.add('activo');
+    document.body.classList.add('sidebar-open');
+    openBtn?.setAttribute('aria-expanded', 'true');
+    sidebar?.setAttribute('aria-hidden', 'false');
+    overlay?.setAttribute('aria-hidden', 'false');
+  };
+  const closeSidebar = () => {
+    sidebar?.classList.remove('activo');
+    document.body.classList.remove('sidebar-open');
+    openBtn?.setAttribute('aria-expanded', 'false');
+    sidebar?.setAttribute('aria-hidden', 'true');
+    overlay?.setAttribute('aria-hidden', 'true');
+  };
+
+  openBtn?.addEventListener('click', (e) => { e.stopPropagation(); sidebar?.classList.contains('activo') ? closeSidebar() : openSidebar(); });
+  closeBtn?.addEventListener('click', (e) => { e.stopPropagation(); closeSidebar(); });
+  overlay?.addEventListener('click', closeSidebar);
+
+  document.querySelectorAll('.has-submenu > a').forEach(anchor => {
+    anchor.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      const parent = anchor.parentElement;
+      const sm = parent?.querySelector('.submenu');
+      if (!parent || !sm) return;
+      sm.classList.toggle('activo');
+      parent.classList.toggle('open');
+    });
+  });
+
+  const btnHistorial = document.getElementById('btnHistorial');
+  const historial = document.getElementById('historialRecompensas');
+  const lista = document.getElementById('listaRecompensas');
+
+  let recompensas = [
+    { nombre: "EcoBonus", puntos: 50, fecha: "2025-09-01" },
+    { nombre: "ReciclajePlus", puntos: 30, fecha: "2025-09-10" },
+    { nombre: "VerdeExtra", puntos: 20, fecha: "2025-09-15" }
+  ];
+
+  btnHistorial.addEventListener('click', () => {
+    lista.innerHTML = "";
+    recompensas.forEach(r => {
+      const li = document.createElement('li');
+      li.textContent = `${r.fecha}: ${r.nombre} - ${r.puntos} puntos`;
+      lista.appendChild(li);
+    });
+    historial.style.display = historial.style.display === 'block' ? 'none' : 'block';
+  });
+
+  const form = document.getElementById('formRecompensa');
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const nombre = document.getElementById('nombre').value;
+    const puntos = document.getElementById('costo').value;
+    const fecha = new Date().toISOString().split('T')[0];
+    recompensas.push({ nombre, puntos, fecha });
+    form.reset();
+    lista.innerHTML = "";
+    recompensas.forEach(r => {
+      const li = document.createElement('li');
+      li.textContent = `${r.fecha}: ${r.nombre} - ${r.puntos} puntos`;
+      lista.appendChild(li);
+    });
+    historial.style.display = 'block';
+  });
+});
+const openSidebarBtn = document.getElementById('openSidebar');
+const closeSidebarBtn = document.getElementById('closeSidebar');
+const sidebar = document.getElementById('sidebar');
+const mainContent = document.getElementById('mainContent');
+
+function openSidebar() {
+    sidebar.classList.add('active');
+    mainContent.style.transform = 'translateX(260px)';
+}
+function closeSidebar() {
+    sidebar.classList.remove('active');
+    mainContent.style.transform = 'translateX(0)';
+}
+
+openSidebarBtn.addEventListener('click', () => {
+    if(sidebar.classList.contains('active')) closeSidebar();
+    else openSidebar();
+});
+
+if(closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+
+// Submenú toggle
+document.querySelectorAll('.submenu-toggle').forEach(toggle => {
+    toggle.addEventListener('click', (e) => {
+        e.preventDefault();           // Evita que siga el enlace
+        e.stopPropagation();          // Evita que el clic cierre el sidebar
+        toggle.parentElement.classList.toggle('active');
+    });
+});
+
+// Enlaces normales cierran el sidebar
+sidebar.querySelectorAll('a').forEach(a => {
+    if(!a.classList.contains('submenu-toggle')) {
+        a.addEventListener('click', closeSidebar);
+    }
+});
+
+// Close on Escape
+document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && sidebar.classList.contains('active')) closeSidebar();
+});
+
+document.querySelectorAll('.submenu-toggle').forEach(toggle => {
+  const parent = toggle.parentElement; // li.submenu-parent
+  const submenu = parent.querySelector('.submenu');
+
+  toggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation(); // evita que el clic cierre otro menú
+    submenu.classList.toggle('active'); // solo alterna la visibilidad de este submenú
+  });
+});
+
+// Cerrar submenús si se hace clic fuera
+document.addEventListener('click', (e) => {
+  document.querySelectorAll('.submenu.active').forEach(sm => {
+    if (!sm.parentElement.contains(e.target)) {
+      sm.classList.remove('active');
+    }
+  });
+});
+
+</script>
+
+{% endblock %}

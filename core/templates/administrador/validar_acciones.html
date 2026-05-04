@@ -1,0 +1,110 @@
+{% extends "administrador/base.html" %}
+{% load static %}
+{% block titulo %}Validar Acciones Destacadas{% endblock %}
+
+{% block cabeza_extra %}
+<link rel="stylesheet" href="{% static 'administrador/css/estilos.css' %}">
+<style>
+  .page-title { font-size: 2rem; font-weight: 700; color: var(--dark); margin-bottom: 24px; padding-top: 20px; }
+  .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+  .card h2 { font-size: 1.2rem; font-weight: 600; color: var(--dark); margin-bottom: 16px; }
+  .tabla { width: 100%; border-collapse: collapse; }
+  .tabla th { background: #f5f5f5; padding: 12px 10px; text-align: left; font-weight: 600; color: var(--dark); }
+  .tabla td { padding: 12px 10px; border-bottom: 1px solid #eee; color: var(--dark); }
+  .btn-validar { background: #27ae60; color: white; border: none; padding: 7px 16px; border-radius: 20px; cursor: pointer; font-size: 13px; font-weight: 600; }
+  .btn-validar:hover { background: #2ecc71; }
+</style>
+{% endblock %}
+
+{% block cuerpo %}
+{% include 'administrador/header.html' %}
+
+<main class="page-container">
+  <div class="wrapper">
+    <div class="form-container">
+      <h1 class="page-title">Validar Acciones Destacadas</h1>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div style="padding:12px 16px; border-radius:8px; margin-bottom:16px;
+              background:{% if message.tags == 'error' %}#fdecea{% else %}#e8f5e9{% endif %};
+              color:{% if message.tags == 'error' %}#c0392b{% else %}#27ae60{% endif %};
+              border:1px solid {% if message.tags == 'error' %}#f5c6cb{% else %}#a3d9a5{% endif %};">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <div class="card">
+        <h2>Acciones pendientes de validacion</h2>
+
+        {% if acciones_pendientes %}
+        <table class="tabla">
+          <thead>
+            <tr>
+              <th>Usuario</th>
+              <th>Jornada</th>
+              <th>Accion destacada</th>
+              <th>Puntos sugeridos</th>
+              <th>Fecha</th>
+              <th>Accion</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for accion in acciones_pendientes %}
+            <tr>
+              <td><strong>{{ accion.inscripcion.usuario.nombre }} {{ accion.inscripcion.usuario.apellido }}</strong></td>
+              <td>{{ accion.inscripcion.jornada.titulo }}</td>
+              <td>{{ accion.descripcion }}</td>
+              <td style="color:#27ae60; font-weight:600;">{{ accion.puntos_sugeridos }} pts</td>
+              <td>{{ accion.fecha_registro }}</td>
+              <td>
+                <form method="POST" action="{% url 'admi_validar_acciones' %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="accion_id" value="{{ accion.id }}">
+                  <button type="submit" class="btn-validar">Validar y asignar puntos</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+          <p style="color:#888;">No hay acciones destacadas pendientes de validacion.</p>
+        {% endif %}
+      </div>
+
+    </div>
+  </div>
+</main>
+
+{% include 'administrador/footer.html' %}
+<script>
+const openSidebarBtn = document.getElementById('openSidebar');
+const closeSidebarBtn = document.getElementById('closeSidebar');
+const sidebar = document.getElementById('sidebar');
+
+function openSidebar() { sidebar.classList.add('active'); }
+function closeSidebar() { sidebar.classList.remove('active'); }
+
+openSidebarBtn.addEventListener('click', () => {
+    sidebar.classList.contains('active') ? closeSidebar() : openSidebar();
+});
+if(closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+
+document.querySelectorAll('.submenu-toggle').forEach(toggle => {
+  const submenu = toggle.parentElement.querySelector('.submenu');
+  toggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    submenu.classList.toggle('active');
+  });
+});
+
+document.addEventListener('click', (e) => {
+  document.querySelectorAll('.submenu.active').forEach(sm => {
+    if (!sm.parentElement.contains(e.target)) sm.classList.remove('active');
+  });
+});
+</script>
+{% endblock %}

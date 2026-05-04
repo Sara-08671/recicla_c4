@@ -1,0 +1,28 @@
+<!-- core/templates/administrador/usuarios_pdf.html -->
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+table { width:100%; border-collapse: collapse; }
+td, th { border: 1px solid #ddd; padding: 6px; font-size:12px;}
+</style>
+</head>
+<body>
+<h2>Export Usuarios</h2>
+<table>
+<thead><tr><th>ID</th><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th></tr></thead>
+<tbody>
+{% for u in usuarios %}
+<tr>
+  <td>{{ u.id_usuario }}</td>
+  <td>{{ u.nombre }} {{ u.apellido }}</td>
+  <td>{{ u.correo }}</td>
+  <td>{{ u.rol }}</td>
+  <td>{{ u.estado }}</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+</body>
+</html>

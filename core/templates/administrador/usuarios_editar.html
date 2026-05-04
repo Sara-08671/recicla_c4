@@ -1,0 +1,45 @@
+{% extends "administrador/base.html" %}
+{% load static %}
+
+{% block cuerpo %}
+<link rel="stylesheet" href="{% static 'administrador/css/estilos.css' %}">
+<link rel="stylesheet" href="{% static 'administrador/css/usuarios.css' %}">
+{% include 'administrador/header.html' %}
+<div class="page-container">
+
+    <h2 class="title">✏️ Editar Usuario</h2>
+
+    <form method="POST" class="form-card">
+        {% csrf_token %}
+
+        <label>Nombre</label>
+        <input type="text" name="nombre" value="{{ usuario.nombre }}" required>
+
+        <label>Apellido</label>
+        <input type="text" name="apellido" value="{{ usuario.apellido }}" required>
+
+        <label>Correo</label>
+        <input type="email" name="correo" value="{{ usuario.correo }}" required>
+
+        <label>Rol</label>
+        <select name="rol">
+            <option value="residente" {% if usuario.rol == 'residente' %}selected{% endif %}>Residente</option>
+            <option value="organizador" {% if usuario.rol == 'organizador' %}selected{% endif %}>Organizador</option>
+            <option value="administrador" {% if usuario.rol == 'administrador' %}selected{% endif %}>Administrador</option>
+        </select>
+
+        <label>Estado</label>
+        <select name="estado">
+            <option value="activo" {% if usuario.estado == 'activo' %}selected{% endif %}>Activo</option>
+            <option value="suspendido" {% if usuario.estado == 'suspendido' %}selected{% endif %}>Suspendido</option>
+        </select>
+
+        <label>Nueva contraseña (opcional)</label>
+        <input type="password" name="nueva_contrasena">
+
+        <button class="btn-save">Actualizar</button>
+    </form>
+
+</div>
+{% include 'administrador/footer.html' %}
+{% endblock %}

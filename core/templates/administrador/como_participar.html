@@ -1,0 +1,135 @@
+{% extends "administrador/base.html" %}
+{% load static %}
+{% block titulo %}Recicla Comuna 4 — Como_participar{% endblock %}
+
+{% block cabeza_extra %}
+  <link rel="stylesheet" href="{% static 'administrador/css/estilos.css' %}">
+ <link rel="stylesheet" href="{% static 'administrador/css/funciona.css' %}">
+{% endblock %}
+
+{% block cuerpo %}
+{% include 'administrador/header.html' %}
+
+<main class="page-container" id="mainContent">
+    <h1 class="main-title">¿Cómo Funciona Recicla Comuna 4?</h1>
+    <p class="main-desc">Hacemos que el reciclaje sea fácil y gratificante. Participa en la transformación de la Comuna 4 hacia la sostenibilidad.</p>
+
+    <div class="steps">
+        <div class="step-card">
+            <div class="step-number">1</div>
+            <div class="step-icon">♻️</div>
+            <div class="step-title">Clasifica tus residuos</div>
+            <div class="step-desc">Separa plásticos, papel, cartón, vidrio y metales en tu hogar.</div>
+        </div>
+        <div class="step-card">
+            <div class="step-number">2</div>
+            <div class="step-icon">📝</div>
+            <div class="step-title">Registra tu recolección</div>
+            <div class="step-desc">Usa nuestro formulario para registrar el material que tienes listo.</div>
+        </div>
+        <div class="step-card">
+            <div class="step-number">3</div>
+            <div class="step-icon">📍</div>
+            <div class="step-title">Participa en jornadas</div>
+            <div class="step-desc">Acude a nuestros puntos de recolección y conoce a otros recicladores.</div>
+        </div>
+        <div class="step-card">
+            <div class="step-number">4</div>
+            <div class="step-icon">⭐</div>
+            <div class="step-title">Acumula puntos</div>
+            <div class="step-desc">Por cada kg de material reciclado, acumulas puntos canjeables.</div>
+        </div>
+        <div class="step-card">
+            <div class="step-number">5</div>
+            <div class="step-icon">🌿</div>
+            <div class="step-title">Contribuye al ambiente</div>
+            <div class="step-desc">Tu esfuerzo ayuda a reducir la contaminación y construir un futuro más verde.</div>
+        </div>
+    </div>
+
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <a href="#registro" class="btn-join">¡Únete Ahora!</a>
+</main>
+{% include 'administrador/footer.html' %}
+<script>
+// --- SUBMENÚ UNIVERSAL (FUNCIONA CON CUALQUIER ESTRUCTURA) ---
+document.querySelectorAll('.submenu-parent > a').forEach(btn => {
+    btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const parent = this.parentElement;
+        const submenu = parent.querySelector('.submenu');
+
+        if (!submenu) return;
+
+        // Cerrar otros submenús
+        document.querySelectorAll('.submenu').forEach(sm => {
+            if (sm !== submenu) sm.classList.remove('active');
+        });
+
+        submenu.classList.toggle('active');
+        parent.classList.toggle('active');
+    });
+});
+
+// Sidebar toggle
+const openSidebarBtn = document.getElementById('openSidebar');
+const closeSidebarBtn = document.getElementById('closeSidebar');
+const sidebar = document.getElementById('sidebar');
+const mainContent = document.getElementById('mainContent');
+
+function openSidebar() { sidebar.classList.add('active'); mainContent.style.transform = 'translateX(260px)'; }
+function closeSidebar() { sidebar.classList.remove('active'); mainContent.style.transform = 'translateX(0)'; }
+
+openSidebarBtn.addEventListener('click', () => sidebar.classList.contains('active') ? closeSidebar() : openSidebar());
+closeSidebarBtn.addEventListener('click', closeSidebar);
+
+document.addEventListener('keydown', e => { if(e.key==='Escape' && sidebar.classList.contains('active')) closeSidebar(); });
+
+// Scroll progress
+const progressBar = document.getElementById('progressBar');
+window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.body.scrollHeight - window.innerHeight;
+    progressBar.style.width = (scrollTop / docHeight * 100) + '%';
+});
+
+const mainContentEl = document.getElementById('mainContent');
+const joinBtn = mainContentEl.querySelector('.btn-join');
+
+for(let i=0; i<15; i++){
+    const leaf = document.createElement('div');
+    leaf.classList.add('leaf');
+    leaf.style.left = Math.random() * 100 + '%';
+    leaf.style.top = (joinBtn.offsetTop + joinBtn.offsetHeight + Math.random() * 50) + 'px'; // justo debajo del botón
+    leaf.style.width = 12 + Math.random() * 16 + 'px';
+    leaf.style.height = leaf.style.width;
+    leaf.style.animationDuration = 4 + Math.random() * 4 + 's';
+    mainContentEl.appendChild(leaf);
+}
+
+
+// Enlaces normales cierran el sidebar, pero NO los que son submenú
+sidebar.querySelectorAll('a').forEach(a => {
+  if(!a.classList.contains('submenu-toggle')) {
+    a.addEventListener('click', closeSidebar);
+  }
+});
+
+
+
+// Cerrar submenús si se hace clic fuera
+document.addEventListener('click', (e) => {
+  document.querySelectorAll('.submenu.active').forEach(sm => {
+    if (!sm.parentElement.contains(e.target)) {
+      sm.classList.remove('active');
+    }
+  });
+});
+
+</script>
+{% endblock %}

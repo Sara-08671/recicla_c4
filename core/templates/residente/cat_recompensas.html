@@ -1,0 +1,280 @@
+{% extends "residente/base.html" %}
+{% load static %}
+{% block titulo %}Recicla Comuna 4 — Canje de Recompensas{% endblock %}
+
+{% block cabeza_extra %}
+  <link rel="stylesheet" href="{% static 'residente/css/estilos recompensa.css' %}">
+{% endblock %}
+
+{% block cuerpo %}
+{% include 'residente/header.html' %}
+
+
+<!-- Contenido -->
+<main class="page-container" id="mainContent">
+  <section class="catalogo-section">
+    <canvas id="bgCanvas"></canvas>
+
+    <h1 class="main-title">🎁 Catálogo de Recompensas</h1>
+    <p class="main-desc">Acumula puntos con tus acciones de reciclaje y cámbialos por recompensas ecológicas.</p>
+    
+    <div style="text-align:center;">
+        <div class="points-display">
+            <i class="fas fa-coins"></i>
+            <span id="puntos-usuario">350</span> puntos disponibles
+        </div>
+    </div>
+
+
+<!-- Mensaje de canje arriba -->
+  
+
+
+    <!-- 🔍 Filtros -->
+    <div class="catalogo-filtros">
+      <input type="text" id="searchInput" placeholder="Buscar recompensa..." aria-label="Buscar recompensa">
+      <select id="filterCategoria" aria-label="Filtrar por categoría">
+        <option value="all">Todas las categorías</option>
+        <option value="Accesorios">Accesorios</option>
+        <option value="Hogar">Hogar</option>
+        <option value="Ropa">Ropa</option>
+        <option value="Herramientas">Herramientas</option>
+      </select>
+    </div>
+
+    <!-- ✅ Mensaje de canje arriba -->
+<div id="mensaje-canje" style="display:none;" class="alert text-center"></div>
+    <!-- Resumen de canje -->
+    <div class="card mt-4 mb-4" id="resumen-card">
+      <div class="card-header">
+        <i class="fas fa-check-circle me-2"></i> Resumen de Canje
+      </div>
+      <div class="card-body">
+        <p class="card-text">Selecciona una recompensa para ver el resumen aquí.</p>
+        <div id="resumen-content" class="d-none">
+          <p><strong>Recompensa seleccionada:</strong> <span id="resumen-recompensa">-</span></p>
+          <p><strong>Puntos a utilizar:</strong> <span id="resumen-puntos">0</span></p>
+          <p><strong>Puntos restantes:</strong> <span id="resumen-restantes">0</span></p>
+          <button class="btn btn-canje w-100" id="btn-confirmar" aria-label="Confirmar canje">
+            <i class="fas fa-check me-2"></i>Confirmar Canje
+          </button>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Catálogo -->
+    <div class="catalogo" id="catalogo">
+      <!-- Ejemplo 1 -->
+      <div class="recompensa-card-catalogo" data-categoria="Accesorios" data-nombre="Bolsa ecológica" data-puntos="500">
+        <img src="https://picsum.photos/400/200?random=1" alt="Bolsa ecológica de tela">
+        <div class="recompensa-body">
+          <h3 class="recompensa-title">Bolsa ecológica</h3>
+          <p class="recompensa-desc">Bolsa de tela resistente y reutilizable para tus compras.</p>
+          <div class="recompensa-meta">
+            <span><i class="fas fa-tag"></i> Accesorios</span>
+            <span><i class="fas fa-coins"></i> 500 pts</span>
+            <span><i class="fas fa-cubes"></i> 25 unidades</span>
+            <span class="estado-activa"><i class="fas fa-check-circle"></i> Activa</span>
+          </div>
+          <button class="btn-canjear" aria-label="Seleccionar Bolsa ecológica">Seleccionar</button>
+        </div>
+      </div>
+
+      <!-- Ejemplo 2 -->
+      <div class="recompensa-card-catalogo" data-categoria="Hogar" data-nombre="Botella reutilizable" data-puntos="800">
+        <img src="https://picsum.photos/400/200?random=2" alt="Botella reutilizable de acero inoxidable">
+        <div class="recompensa-body">
+          <h3 class="recompensa-title">Botella reutilizable</h3>
+          <p class="recompensa-desc">Botella de acero inoxidable que mantiene tu bebida fría o caliente.</p>
+          <div class="recompensa-meta">
+            <span><i class="fas fa-tag"></i> Hogar</span>
+            <span><i class="fas fa-coins"></i> 800 pts</span>
+            <span><i class="fas fa-cubes"></i> 15 unidades</span>
+            <span class="estado-activa"><i class="fas fa-check-circle"></i> Activa</span>
+          </div>
+          <button class="btn-canjear" aria-label="Seleccionar Botella reutilizable">Seleccionar</button>
+        </div>
+      </div>
+
+      <!-- Ejemplo 3 -->
+      <div class="recompensa-card-catalogo" data-categoria="Ropa" data-nombre="Camiseta ecológica" data-puntos="1200">
+        <img src="https://picsum.photos/400/200?random=3" alt="Camiseta ecológica reciclada">
+        <div class="recompensa-body">
+          <h3 class="recompensa-title">Camiseta ecológica</h3>
+          <p class="recompensa-desc">Elaborada con fibras recicladas, cómoda y ligera.</p>
+          <div class="recompensa-meta">
+            <span><i class="fas fa-tag"></i> Ropa</span>
+            <span><i class="fas fa-coins"></i> 1200 pts</span>
+            <span><i class="fas fa-cubes"></i> 10 unidades</span>
+            <span class="estado-inactiva"><i class="fas fa-times-circle"></i> Inactiva</span>
+          </div>
+          <button class="btn-canjear disabled" aria-disabled="true">No disponible</button>
+        </div>
+      </div>
+
+      <!-- Ejemplo 4 -->
+      <div class="recompensa-card-catalogo" data-categoria="Herramientas" data-nombre="Kit de reciclaje" data-puntos="200">
+        <img src="https://picsum.photos/400/200?random=4" alt="Kit de reciclaje con guantes y bolsas">
+        <div class="recompensa-body">
+          <h3 class="recompensa-title">Kit de reciclaje</h3>
+          <p class="recompensa-desc">Incluye guantes, bolsas biodegradables y contenedores pequeños.</p>
+          <div class="recompensa-meta">
+            <span><i class="fas fa-tag"></i> Herramientas</span>
+            <span><i class="fas fa-coins"></i> 200 pts</span>
+            <span><i class="fas fa-cubes"></i> 5 unidades</span>
+            <span class="estado-activa"><i class="fas fa-check-circle"></i> Activa</span>
+          </div>
+          <button class="btn-canjear" aria-label="Seleccionar Kit de reciclaje">Seleccionar</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+
+{% include 'residente/footer.html' %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+// ================== JS ==================
+let usuarioActual = { puntos: 350 };
+let recompensaSeleccionada = null;
+
+// Sidebar
+const openSidebarBtn = document.getElementById("openSidebar");
+const closeSidebarBtn = document.getElementById("closeSidebar");
+const sidebar = document.getElementById("sidebar");
+
+if (openSidebarBtn && closeSidebarBtn && sidebar) {
+  openSidebarBtn.addEventListener("click", () => sidebar.classList.add("active"));
+  closeSidebarBtn.addEventListener("click", () => sidebar.classList.remove("active"));
+}
+
+// Toast
+function showToast(msg, type = "info") {
+  const toast = document.createElement("div");
+  toast.className = `toast align-items-center text-bg-${type} border-0 show position-fixed bottom-0 end-0 m-3`;
+  toast.role = "alert";
+  toast.innerHTML = `
+    <div class="d-flex">
+      <div class="toast-body">${msg}</div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+    </div>`;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 4000);
+}
+
+// Selección de recompensa
+function seleccionarRecompensa(card) {
+  const puntos = parseInt(card.dataset.puntos);
+  const nombre = card.dataset.nombre;
+
+  if (puntos > usuarioActual.puntos) {
+    showToast("❌ No tienes puntos suficientes.", "danger");
+    return;
+  }
+
+  document.querySelectorAll(".recompensa-card-catalogo").forEach(c => c.classList.remove("selected"));
+  card.classList.add("selected");
+
+  recompensaSeleccionada = { nombre, puntos };
+
+  document.getElementById("resumen-content").classList.remove("d-none");
+  document.getElementById("resumen-recompensa").textContent = nombre;
+  document.getElementById("resumen-puntos").textContent = puntos;
+  document.getElementById("resumen-restantes").textContent = usuarioActual.puntos - puntos;
+}
+
+// Confirmar canje
+document.getElementById("btn-confirmar")?.addEventListener("click", () => {
+  if (!recompensaSeleccionada) {
+    showToast("⚠️ Selecciona una recompensa primero.", "warning");
+    return;
+  }
+
+  usuarioActual.puntos -= recompensaSeleccionada.puntos;
+  showToast(`🎉 Canje realizado: ${recompensaSeleccionada.nombre}`, "success");
+
+  document.querySelector(".points-display").innerHTML =
+    `<i class="fas fa-coins me-2"></i> ${usuarioActual.puntos} puntos disponibles`;
+
+  // ✅ Mostrar mensaje dentro del resumen
+  const mensaje = document.getElementById("mensaje-canje");
+  mensaje.textContent = `✅ Canje exitoso: ${recompensaSeleccionada.nombre}`;
+  mensaje.className = "success";  // activa estilo
+  mensaje.style.display = "block";
+  mensaje.style.opacity = "1";
+
+  // Ocultarlo después de 4 seg
+  setTimeout(() => {
+    mensaje.style.opacity = "0";
+    setTimeout(() => {
+      mensaje.style.display = "none";
+    }, 500);
+  }, 4000);
+
+  // Reiniciar selección
+  document.querySelectorAll(".recompensa-card-catalogo").forEach(c => c.classList.remove("selected"));
+  recompensaSeleccionada = null;
+  document.getElementById("resumen-content").classList.add("d-none");
+});
+
+
+// Filtros
+document.getElementById("searchInput")?.addEventListener("input", filtrarCatalogo);
+document.getElementById("filterCategoria")?.addEventListener("change", filtrarCatalogo);
+
+function filtrarCatalogo() {
+  const busqueda = document.getElementById("searchInput").value.toLowerCase();
+  const categoria = document.getElementById("filterCategoria").value;
+
+  document.querySelectorAll(".recompensa-card-catalogo").forEach(card => {
+    const nombre = card.dataset.nombre.toLowerCase();
+    const cat = card.dataset.categoria;
+
+    const coincideBusqueda = nombre.includes(busqueda);
+    const coincideCategoria = (categoria === "all" || cat === categoria);
+
+    card.style.display = coincideBusqueda && coincideCategoria ? "" : "none";
+  });
+}
+
+// Selección con click
+document.addEventListener("click", e => {
+  if (e.target.classList.contains("btn-canjear") && !e.target.classList.contains("disabled")) {
+    seleccionarRecompensa(e.target.closest(".recompensa-card-catalogo"));
+  }
+});
+// ================== SUBMENÚS DEL SIDEBAR ==================
+
+document.querySelectorAll('.submenu-toggle').forEach(btn => {
+  btn.addEventListener('click', e => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Encuentra el submenu relativo
+    const submenu = btn.parentElement.querySelector('.submenu');
+    if (!submenu) return;
+
+    // Cerrar otros submenús en el mismo contenedor (sidebar o header)
+    const container = btn.closest('aside, header');
+    container.querySelectorAll('.submenu').forEach(sm => {
+      if (sm !== submenu) sm.classList.remove('active');
+    });
+
+    submenu.classList.toggle('active');
+  });
+});
+
+// Cerrar submenús si clic fuera de sidebar o header
+document.addEventListener('click', e => {
+  document.querySelectorAll('aside, header').forEach(container => {
+    if (!container.contains(e.target)) {
+      container.querySelectorAll('.submenu').forEach(sm => sm.classList.remove('active'));
+    }
+  });
+});
+
+
+</script>
+{% endblock %}

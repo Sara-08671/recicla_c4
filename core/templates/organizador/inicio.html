@@ -1,0 +1,97 @@
+{% extends "organizador/base.html" %}
+{% load static %}
+{% block titulo %}Recicla Comuna 4 — Inicio{% endblock %}
+
+{% block cabeza_extra %}
+ <link rel="stylesheet" href="{% static 'organizador/css/estilos.css' %}">
+ <link rel="stylesheet" href="{% static 'organizador/css/inicio.css' %}">
+{% endblock %}
+
+{% block cuerpo %}
+{% include 'organizador/header.html' %}
+
+<!--#region contenido-->
+<main class="page-container" id="mainContent">
+
+<section class="hero" id="inicio" role="region" aria-label="Hero">
+  <div>
+      <h1>Bienvenido, {{ request.session.usuario_nombre }} ({{ request.session.usuario_rol|capfirst }})</h1>
+      <div class="cta-buttons">
+          <a href="{% url 'organizador_creacion_jornadas'%}" class="btn-join" style="text-decoration: none;background:transparent;color:white;border:2px solid rgba(255,255,255,0.85);border-radius: 40px;padding: 4px;">Crear jornada</a>
+      </div>
+  </div>
+</section>
+
+</main>
+
+{% include 'organizador/footer.html' %}
+
+<!--#region java-->
+<script>
+const openSidebarBtn = document.getElementById('openSidebar');
+const closeSidebarBtn = document.getElementById('closeSidebar');
+const sidebar = document.getElementById('sidebar');
+const mainContent = document.getElementById('mainContent');
+
+function openSidebar() {
+    sidebar.classList.add('active');
+    mainContent.style.transform = 'translateX(260px)';
+}
+function closeSidebar() {
+    sidebar.classList.remove('active');
+    mainContent.style.transform = 'translateX(0)';
+}
+
+openSidebarBtn.addEventListener('click', () => {
+    if(sidebar.classList.contains('active')) closeSidebar();
+    else openSidebar();
+});
+
+if(closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+
+// Submenú toggle
+document.querySelectorAll('.submenu-toggle').forEach(toggle => {
+    toggle.addEventListener('click', (e) => {
+        e.preventDefault();           // Evita que siga el enlace
+        e.stopPropagation();          // Evita que el clic cierre el sidebar
+        toggle.parentElement.classList.toggle('active');
+    });
+});
+
+// Enlaces normales cierran el sidebar
+sidebar.querySelectorAll('a').forEach(a => {
+    if(!a.classList.contains('submenu-toggle')) {
+        a.addEventListener('click', closeSidebar);
+    }
+});
+
+// Close on Escape
+document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && sidebar.classList.contains('active')) closeSidebar();
+});
+
+document.querySelectorAll('.submenu-toggle').forEach(toggle => {
+  const parent = toggle.parentElement; // li.submenu-parent
+  const submenu = parent.querySelector('.submenu');
+
+  toggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation(); // evita que el clic cierre otro menú
+    submenu.classList.toggle('active'); // solo alterna la visibilidad de este submenú
+  });
+});
+
+// Cerrar submenús si se hace clic fuera
+document.addEventListener('click', (e) => {
+  document.querySelectorAll('.submenu.active').forEach(sm => {
+    if (!sm.parentElement.contains(e.target)) {
+      sm.classList.remove('active');
+    }
+  });
+});
+
+</script>
+
+
+
+{% endblock %}

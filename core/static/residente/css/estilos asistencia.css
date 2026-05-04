@@ -1,0 +1,345 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Fondo general */
+body {
+  min-height: 100vh;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(135deg, #a8e6cf, #dcedc1);
+  padding-top: 70px; /* deja espacio para menú superior */
+}
+
+/* ===== Menú Superior (mejorado) ===== */
+.menu-superior {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(90deg, #369a59, #1d6f45);
+  color: white;
+  padding: 12px 30px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  border-bottom: 3px solid #66bb6a;
+}
+
+/* Logo */
+.menu-superior .logo {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+  transition: transform 0.3s ease;
+}
+
+.menu-superior .logo:hover {
+  transform: scale(1.05);
+}
+
+/* Menú navegación */
+.menu-superior nav ul {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+  margin: 0;
+  padding: 0;
+}
+
+.menu-superior nav ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  padding: 8px 15px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.menu-superior nav ul li a:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  font-weight: 600;
+}
+
+.menu-superior nav ul li a::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #c8e6c9;
+  transition: width 0.3s ease;
+}
+
+.menu-superior nav ul li a:hover::after {
+  width: 100%;
+}
+
+/* ===== Layout con menú lateral ===== */
+.layout {
+  display: flex;
+  min-height: calc(100vh - 70px); /* resta altura menú superior */
+}
+
+/* ===== Menú Lateral Estilizado ===== */
+.menu-lateral {
+  position: fixed;
+  top: 70px; /* debajo del menú superior */
+  left: 0;
+  width: 230px;
+  height: 100%;
+  background: linear-gradient(180deg, #e9f7ef, #c8e6c9);
+  padding-top: 20px;
+  border-right: 3px solid #81c784;
+  box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+  border-radius: 0 15px 15px 0;
+  overflow-y: auto;
+}
+
+.menu-lateral ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.menu-lateral ul li {
+  margin: 10px 0;
+}
+
+.menu-lateral ul li a {
+  text-decoration: none;
+  color: #2f4f4f;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.menu-lateral ul li a:hover {
+  background: linear-gradient(90deg, #66bb6a, #388e3c);
+  color: white;
+  transform: translateX(5px);
+  box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+}
+
+.menu-lateral ul li a.active {
+  background: #388e3c;
+  color: white;
+  font-weight: 700;
+  box-shadow: inset 0px 0px 8px rgba(0,0,0,0.2);
+}
+
+/* ===== Submenú Jornadas ===== */
+.menu-lateral ul li ul.submenu {
+  display: none;
+  list-style: none;
+  padding-left: 10px;
+  margin-top: 5px;
+  border-left: 3px solid #66bb6a;
+  border-radius: 5px;
+  background: rgba(200, 230, 201, 0.5);
+}
+
+.menu-lateral ul li ul.submenu.activo {
+  display: block;
+  animation: fadeIn 0.4s ease;
+}
+
+.menu-lateral ul li ul.submenu li a {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #2e7d32;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.menu-lateral ul li ul.submenu li a:hover {
+  background-color: #a8e6cf;
+  color: #1b4332;
+  font-weight: 600;
+  transform: translateX(4px);
+}
+
+/* Flechita ▼ animada */
+.has-submenu > a::after {
+  content: " ▼";
+  font-size: 12px;
+  margin-left: auto;
+  transition: transform 0.3s ease;
+}
+
+.has-submenu.open > a::after {
+  transform: rotate(180deg);
+}
+
+/* Scroll personalizado */
+.menu-lateral::-webkit-scrollbar {
+  width: 6px;
+}
+.menu-lateral::-webkit-scrollbar-thumb {
+  background: #81c784;
+  border-radius: 3px;
+}
+.menu-lateral::-webkit-scrollbar-track {
+  background: #e9f7ef;
+}
+
+/* --- Submenú Foros --- */
+.menu-superior ul li ul.submenu {
+  display: none;
+  position: absolute;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0px 6px 15px rgba(0,0,0,0.2);
+  margin-top: 8px;
+  padding: 10px 0;
+  list-style: none;
+  animation: slideDown 0.3s ease;
+}
+
+.menu-superior ul li ul.submenu li a {
+  display: block;
+  padding: 10px 20px;
+  color: #2f4f4f;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.menu-superior ul li ul.submenu li a:hover {
+  background: #a8e6cf;
+  color: #1b4332;
+  font-weight: 600;
+}
+
+.menu-superior ul li.has-submenu:hover ul.submenu {
+  display: block;
+}
+
+/* Animación deslizar */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Contenido ===== */
+.contenido {
+  flex: 1;
+  margin-left: 230px; /* deja espacio al menú lateral */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.container {
+  width: 90%;
+  max-width: 650px;
+  background: white;
+  padding: 35px;
+  border-radius: 15px;
+  box-shadow: 0px 10px 25px rgba(0,0,0,0.15);
+  animation: fadeIn 0.8s ease;
+}
+
+/* Título */
+.container h1 {
+  text-align: center;
+  background: linear-gradient(90deg, #66bb6a, #2e7d32);
+  color: white;
+  padding: 18px 25px;
+  border-radius: 12px;
+  font-size: 28px;
+  font-weight: bold;
+  margin-bottom: 25px;
+  box-shadow: 0px 6px 15px rgba(0,0,0,0.2);
+}
+
+/* Tarjeta */
+.card {
+  background: #f9fff9;
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid #c8e6c9;
+  margin-bottom: 20px;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+}
+
+.card h2 {
+  color: #2e7d32;
+  margin-bottom: 12px;
+}
+
+/* Inputs y selects */
+select, textarea, input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #c8e6c9;
+  border-radius: 10px;
+  font-size: 16px;
+  background-color: #f9fff9;
+  transition: all 0.3s ease;
+  margin-top: 8px;
+}
+
+textarea {
+  height: 90px;
+  resize: none;
+}
+
+select:focus, textarea:focus, input:focus {
+  border-color: #388e3c;
+  outline: none;
+  box-shadow: 0px 0px 10px rgba(56, 142, 60, 0.4);
+}
+
+/* Checkbox */
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+  color: #2e7d32;
+  margin-top: 10px;
+}
+
+/* Animación */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(15px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+  .menu-lateral {
+    display: none;
+  }
+  .contenido {
+    margin-left: 0;
+    padding: 10px;
+    align-items: flex-start;
+  }
+  .container {
+    margin: 0 auto;
+  }
+}

@@ -1,0 +1,120 @@
+{% extends "residente/base.html" %}
+{% load static %}
+{% block titulo %}Inscripción a Jornadas — Recicla Comuna 4{% endblock %}
+
+{% block cabeza_extra %}
+ <link rel="stylesheet" href="{% static 'residente/css/estilos_residentes.css' %}">
+ <link rel="stylesheet" href="{% static 'residente/css/inscripcion.css' %}">
+{% endblock %}
+
+{% block cuerpo %}
+{% include 'residente/header.html' %}
+
+<main class="page-container" id="mainContent">
+
+  <div>
+    <div class="info-card">
+      <h3><i class="fas fa-info-circle"></i> Sobre este formulario</h3>
+      <p>Este formulario te permite <b>inscribirte en las jornadas de reciclaje</b> organizadas en la Comuna 4.</p>
+      <p><i class="fas fa-check-circle"></i> Participar en actividades comunitarias.</p>
+      <p><i class="fas fa-check-circle"></i> Contribuir a un entorno más limpio.</p>
+      <p><i class="fas fa-check-circle"></i> Acumular recompensas ecológicas.</p>
+    </div>
+    <div class="gif-container">
+      <img src="https://i.gifer.com/7efs.gif" alt="Reciclaje animado" />
+    </div>
+  </div>
+
+  <div class="form-container active">
+    <h2>Formulario de Inscripción a Jornadas</h2>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div style="padding: 12px 16px; border-radius: 8px; margin-bottom: 16px;
+            background: {% if message.tags == 'error' %}#fdecea{% else %}#e8f5e9{% endif %};
+            color: {% if message.tags == 'error' %}#c0392b{% else %}#27ae60{% endif %};
+            border: 1px solid {% if message.tags == 'error' %}#f5c6cb{% else %}#a3d9a5{% endif %};">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    {% if inscripcion_exitosa %}
+      <div style="padding: 16px; border-radius: 8px; background: #e8f5e9;
+                  border: 1px solid #a3d9a5; margin-bottom: 20px; color: #27ae60;">
+        <strong>¡Inscripcion exitosa!</strong><br><br>
+        <strong>Jornada:</strong> {{ jornada.titulo }}<br>
+        <strong>Fecha:</strong> {{ jornada.fecha }}<br>
+        <strong>Hora:</strong> {{ jornada.hora }}<br>
+        <strong>Lugar:</strong> {{ jornada.direccion }}, {{ jornada.barrio }}<br>
+        <strong>Material:</strong> {{ jornada.tipo_material }}<br><br>
+        Se envio una confirmacion a tu correo y a tus notificaciones.
+      </div>
+    {% else %}
+      <form method="POST" action="{% url 'residente_inscripcion' jornada.id_jornada %}">
+        {% csrf_token %}
+        <div class="campo">
+          <label>Usuario</label>
+          <input type="text" value="{{ usuario.nombre }} {{ usuario.apellido }}" readonly>
+        </div>
+        <div class="campo">
+          <label>Jornada</label>
+          <input type="text" value="{{ jornada.titulo }}" readonly>
+        </div>
+        <div class="campo">
+          <label>Fecha</label>
+          <input type="text" value="{{ jornada.fecha }}" readonly>
+        </div>
+        <div class="campo">
+          <label>Hora</label>
+          <input type="text" value="{{ jornada.hora }}" readonly>
+        </div>
+        <div class="campo">
+          <label>Lugar</label>
+          <input type="text" value="{{ jornada.direccion }}, {{ jornada.barrio }}" readonly>
+        </div>
+        <div class="campo">
+          <label>Material</label>
+          <input type="text" value="{{ jornada.tipo_material }}" readonly>
+        </div>
+        <button type="submit">Guardar Inscripción</button>
+      </form>
+    {% endif %}
+
+  </div>
+
+</main>
+{% include 'residente/footer.html' %}
+
+<script>
+const openSidebarBtn = document.getElementById('openSidebar');
+const closeSidebarBtn = document.getElementById('closeSidebar');
+const sidebar = document.getElementById('sidebar');
+const mainContent = document.getElementById('mainContent');
+
+function openSidebar() { sidebar.classList.add('active'); mainContent.style.transform = 'translateX(260px)'; }
+function closeSidebar() { sidebar.classList.remove('active'); mainContent.style.transform = 'translateX(0)'; }
+
+openSidebarBtn.addEventListener('click', () => { sidebar.classList.contains('active') ? closeSidebar() : openSidebar(); });
+if(closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+
+document.querySelectorAll('.submenu-toggle').forEach(toggle => {
+  const parent = toggle.parentElement;
+  const submenu = parent.querySelector('.submenu');
+  toggle.addEventListener('click', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    submenu.classList.toggle('active');
+  });
+});
+
+document.addEventListener('click', (e) => {
+  document.querySelectorAll('.submenu.active').forEach(sm => {
+    if (!sm.parentElement.contains(e.target)) {
+      sm.classList.remove('active');
+    }
+  });
+});
+</script>
+
+{% endblock %}

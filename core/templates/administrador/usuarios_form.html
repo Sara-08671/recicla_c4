@@ -1,0 +1,15 @@
+<!-- core/templates/administrador/usuarios_form.html -->
+{% extends "administrador/base.html" %}
+{% load static %}
+{% block cuerpo %}
+<div class="page-container">
+  <h1>{% if crear %}Crear usuario{% else %}Editar usuario{% endif %}</h1>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <label>PIN (4-6 dígitos, solo números)</label>
+    <input type="password" name="password_plain" minlength="4" maxlength="6" pattern="[0-9]*" inputmode="numeric" placeholder="PIN de 4-6 dígitos">
+    <button class="btn-save" type="submit">{% if crear %}Crear{% else %}Guardar{% endif %}</button>
+  </form>
+</div>
+{% endblock %}

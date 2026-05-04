@@ -1,0 +1,120 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>{% block titulo %}{% endblock %}</title>
+    {% block cabeza_extra %}{% endblock %}
+</head>
+<body>
+    {% block cuerpo %}
+    {% endblock %}
+
+
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+  // referencias (pueden no existir)
+  const openSidebarBtn = document.getElementById('openSidebar');
+  const closeSidebarBtn = document.getElementById('closeSidebar');
+  const sidebar = document.getElementById('sidebar');
+  const mainContent = document.getElementById('mainContent');
+
+  // funciones sidebar (si existen)
+  function openSidebar() {
+    if (!sidebar) return;
+    sidebar.classList.add('active');
+    if (mainContent) mainContent.style.transform = 'translateX(260px)';
+  }
+  function closeSidebar() {
+    if (!sidebar) return;
+    sidebar.classList.remove('active');
+    if (mainContent) mainContent.style.transform = 'translateX(0)';
+  }
+
+  if (openSidebarBtn) openSidebarBtn.addEventListener('click', () => {
+    if (sidebar && sidebar.classList.contains('active')) closeSidebar();
+    else openSidebar();
+  });
+  if (closeSidebarBtn) closeSidebarBtn.addEventListener('click', closeSidebar);
+
+  // --- SUBMENU: Delegación de eventos ---
+  // Al hacer click en cualquier elemento con clase 'submenu-toggle' manejar el submenu relativo.
+  document.body.addEventListener('click', function (e) {
+    // 1) Si el click es en un toggle (o dentro de él)
+    const toggle = e.target.closest && e.target.closest('.submenu-toggle');
+    if (toggle) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // buscar el .submenu dentro del mismo li.submenu-parent
+      const parent = toggle.closest('.submenu-parent') || toggle.parentElement;
+      const submenu = parent ? parent.querySelector('.submenu') : null;
+
+      if (!submenu) {
+        console.warn('submenu no encontrado para:', toggle);
+        return;
+      }
+
+      // Cerrar otros submenus en el mismo contexto (header o sidebar)
+      const container = toggle.closest('header, nav, aside, .header-right') || document;
+      container.querySelectorAll('.submenu').forEach(sm => {
+        if (sm !== submenu) {
+          sm.classList.remove('active');
+          const t = sm.parentElement ? sm.parentElement.querySelector('.submenu-toggle') : null;
+          if (t) t.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      // Alternar el seleccionado
+      const isOpen = submenu.classList.toggle('active');
+      toggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+      return;
+    }
+
+    // 2) Si se hace click fuera de cualquier submenu abierto, cerrarlos
+    document.querySelectorAll('.submenu.active').forEach(sm => {
+      if (!sm.contains(e.target) && !sm.parentElement.contains(e.target)) {
+        sm.classList.remove('active');
+        const t = sm.parentElement ? sm.parentElement.querySelector('.submenu-toggle') : null;
+        if (t) t.setAttribute('aria-expanded', 'false');
+      }
+    });
+  });
+
+  // Cerrar submenus con Escape
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.submenu.active').forEach(sm => {
+        sm.classList.remove('active');
+        const t = sm.parentElement ? sm.parentElement.querySelector('.submenu-toggle') : null;
+        if (t) t.setAttribute('aria-expanded', 'false');
+      });
+      if (sidebar && sidebar.classList.contains('active')) closeSidebar();
+    }
+  });
+
+  // Por si hay enlaces dentro del sidebar: cerrarlo al hacer click en enlaces normales
+  if (sidebar) {
+    sidebar.querySelectorAll('a').forEach(a => {
+      if (!a.classList.contains('submenu-toggle')) {
+        a.addEventListener('click', closeSidebar);
+      }
+    });
+  }
+
+  // DEBUG: imprime estadísticas en consola para verificar
+  try {
+    const toggles = document.querySelectorAll('.submenu-toggle').length;
+    const submenus = document.querySelectorAll('.submenu').length;
+    console.info(`[DEBUG] submenu-toggle: ${toggles}, submenu: ${submenus}`);
+  } catch (err) {
+    console.warn('DEBUG error', err);
+  }
+});
+</script>
+</body>
+</html>
