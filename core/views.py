@@ -4,7 +4,7 @@ from django.contrib import messages
 from .models import Usuario
 from .forms import JornadaForm
 from django.shortcuts import get_object_or_404, render
-from .models import Jornada, Inscripcion, Asistencia, Puntaje, AccionDestacada
+from .models import Jornada, Inscripcion, Asistencia, Puntaje, AccionDestacada, Recordatorio
 from .forms import InscripcionForm
 from django.utils import timezone
 from .models import Jornada, Usuario
@@ -1673,36 +1673,150 @@ def residente_inscripcion(request, id_jornada):
 
 @rol_required('residente')
 def residente_configuracion(request):
+     usuario_id = request.session.get("usuario_id")
+     usuario = get_object_or_404(Usuario, id_usuario=usuario_id)
+
+     if request.method == "POST":
+         action = request.POST.get("action", "")
+         if action == "password":
+             password_actual = request.POST.get("password_actual")
+             password_nueva = request.POST.get("password_nueva")
+             password_confirmacion = request.POST.get("password_confirmacion")
+
+             if password_actual and password_nueva and password_confirmacion:
+                 if not check_password(password_actual, usuario.contrasena):
+                     messages.error(request, "❌ La contraseña actual es incorrecta.")
+                     return redirect("residente_configuracion")
+
+                 if password_nueva != password_confirmacion:
+                     messages.error(request, "❌ Las nuevas contraseñas no coinciden.")
+                     return redirect("residente_configuracion")
+
+                 try:
+                     validar_contrasena_segura(password_nueva)
+                 except ValidationError as e:
+                     messages.error(request, f"❌ {e.messages[0]}")
+                     return redirect("residente_configuracion")
+
+                 usuario.contrasena = make_password(password_nueva)
+                 usuario.save()
+
+                 messages.success(request, "✔ Contraseña actualizada. Inicia sesión nuevamente.")
+                 return redirect("login")
+
+     return render(request, "residente/configuracion.html", {"user": usuario, 'usuario': usuario})
+
+
+@rol_required('residente')
+def recordatorio_configuracion(request):
     usuario_id = request.session.get("usuario_id")
     usuario = get_object_or_404(Usuario, id_usuario=usuario_id)
 
+    # Obtener recordatorios activos del usuario
+    recordatorios = Recordatorio.objects.filter(
+        usuario=usuario,
+        activo=True
+    ).select_related('jornada').order_by('jornada__fecha')
+
     if request.method == "POST":
-        password_actual = request.POST.get("password_actual")
-        password_nueva = request.POST.get("password_nueva")
-        password_confirmacion = request.POST.get("password_confirmacion")
+        if "guardar_recordatorio" in request.POST:
+            jornada_id = request.POST.get("jornada_id")
+            periodicidad = request.POST.get("periodicidad")
+            jornada = get_object_or_404(Jornada, id_jornada=jornada_id)
 
-        if password_actual and password_nueva and password_confirmacion:
-            if not check_password(password_actual, usuario.contrasena):
-                messages.error(request, "❌ La contraseña actual es incorrecta.")
-                return redirect("residente_configuracion")
+            # Verificar que el usuario esté inscrito y la jornada esté activa
+            inscrito = Inscripcion.objects.filter(
+                usuario=usuario,
+                jornada=jornada,
+                estado='activa'
+            ).exists()
 
-            if password_nueva != password_confirmacion:
-                messages.error(request, "❌ Las nuevas contraseñas no coinciden.")
-                return redirect("residente_configuracion")
+            if not inscrito:
+                messages.error(request, "No estás inscrito en esta jornada.")
+                return redirect("recordatorio_configuracion")
 
-            try:
-                validar_contrasena_segura(password_nueva)
-            except ValidationError as e:
-                messages.error(request, f"❌ {e.messages[0]}")
-                return redirect("residente_configuracion")
+            if jornada.estado not in ['activa', 'en_curso', 'pendiente']:
+                messages.error(request, "La jornada no está activa.")
+                return redirect("recordatorio_configuracion")
 
-            usuario.contrasena = make_password(password_nueva)
-            usuario.save()
+            # Crear o actualizar recordatorio
+            recordatorio, created = Recordatorio.objects.update_or_create(
+                usuario=usuario,
+                jornada=jornada,
+                defaults={
+                    'periodicidad': periodicidad,
+                    'activo': True,
+                    'enviado': False
+                }
+            )
+            if created:
+                messages.success(request, f"Recordatorio configurado para {jornada.titulo} ({periodicidad}).")
+            else:
+                messages.success(request, f"Recordatorio actualizado para {jornada.titulo} ({periodicidad}).")
+            return redirect("recordatorio_configuracion")
 
-            messages.success(request, "✔ Contraseña actualizada. Inicia sesión nuevamente.")
-            return redirect("login")
+        elif "desactivar_recordatorio" in request.POST:
+            recordatorio_id = request.POST.get("recordatorio_id")
+            recordatorio = get_object_or_404(Recordatorio, id_recordatorio=recordatorio_id, usuario=usuario)
+            recordatorio.activo = False
+            recordatorio.save()
+            messages.info(request, "Recordatorio desactivado.")
+            return redirect("recordatorio_configuracion")
 
-    return render(request, "residente/configuracion.html", {"usuario": usuario})
+        elif "activar_recordatorio" in request.POST:
+            recordatorio_id = request.POST.get("recordatorio_id")
+            recordatorio = get_object_or_404(Recordatorio, id_recordatorio=recordatorio_id, usuario=usuario)
+            recordatorio.activo = True
+            recordatorio.enviado = False
+            recordatorio.save()
+            messages.success(request, "Recordatorio activado.")
+            return redirect("recordatorio_configuracion")
+
+        elif "modificar_recordatorio" in request.POST:
+            recordatorio_id = request.POST.get("recordatorio_id")
+            nueva_periodicidad = request.POST.get("periodicidad")
+            recordatorio = get_object_or_404(Recordatorio, id_recordatorio=recordatorio_id, usuario=usuario)
+            recordatorio.periodicidad = nueva_periodicidad
+            recordatorio.enviado = False
+            recordatorio.save()
+            mensaje_periodicidad = {"24h": "24 horas", "1h": "1 hora", "30min": "30 minutos"}.get(nueva_periodicidad, nueva_periodicidad)
+            messages.success(request, f"Periodicidad actualizada a {mensaje_periodicidad} antes.")
+            return redirect("recordatorio_configuracion")
+
+    # Jornadas en las que el usuario está inscrito y que aún no tienen recordatorio
+    inscripciones = Inscripcion.objects.filter(
+        usuario=usuario,
+        estado='activa'
+    ).select_related('jornada')
+
+    jornadas_sin_recordatorio = [
+        ins.jornada for ins in inscripciones
+        if not Recordatorio.objects.filter(usuario=usuario, jornada=ins.jornada, activo=True).exists()
+        and ins.jornada.estado in ['activa', 'en_curso', 'pendiente']
+    ]
+
+    form = RecordatorioForm()
+    return render(request, "residente/recordatorio_configuracion.html", {
+        "usuario": usuario,
+        "recordatorios": recordatorios,
+        "jornadas_sin_recordatorio": jornadas_sin_recordatorio,
+        "form": form,
+    })
+
+
+@rol_required('administrador')
+def recordatorio_gestion(request):
+     """Vista general para gestionar recordatorios (admin)."""
+     recordatorios = Recordatorio.objects.select_related('usuario', 'jornada').order_by('-fecha_creacion')
+
+     estado_filtro = request.GET.get('estado', '')
+     if estado_filtro:
+         recordatorios = recordatorios.filter(activo=(estado_filtro == 'activo'))
+
+     return render(request, "administrador/recordatorio_gestion.html", {
+         "recordatorios": recordatorios,
+         "estado_filtro": estado_filtro,
+     })
 
 @rol_required('residente')
 def residente_recoleccion(request):
@@ -1768,14 +1882,54 @@ def residente_notificaciones(request):
     if not usuario:
         return redirect("login")
 
+    filtro = request.GET.get('filtro', 'todas')
     notificaciones = Notificacion.objects.filter(
         usuario_id=usuario.id_usuario
-    ).order_by('-fecha_envio')
+    )
+
+    if filtro == 'leidas':
+        notificaciones = notificaciones.filter(leido=True)
+    elif filtro == 'no_leidas':
+        notificaciones = notificaciones.filter(leido=False)
+
+    notificaciones = notificaciones.order_by('-fecha_envio')
 
     return render(request, "residente/notificaciones.html", {
         "usuario": usuario,
-        "notificaciones": notificaciones
+        "notificaciones": notificaciones,
+        "filtro_actual": filtro
     })
+
+@rol_required('residente')
+def marcar_notificacion_leida(request, id_notificacion):
+    usuario_id = request.session.get("usuario_id")
+    if not usuario_id:
+        return redirect("login")
+
+    notificacion = get_object_or_404(Notificacion, id_notificacion=id_notificacion, usuario_id=usuario_id)
+    notificacion.leido = True
+    notificacion.save()
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({'status': 'ok', 'leido': True})
+
+    next_url = request.GET.get('next', 'residente_notificaciones')
+    return redirect(next_url)
+
+@rol_required('residente')
+def marcar_notificacion_no_leida(request, id_notificacion):
+    usuario_id = request.session.get("usuario_id")
+    if not usuario_id:
+        return redirect("login")
+
+    notificacion = get_object_or_404(Notificacion, id_notificacion=id_notificacion, usuario_id=usuario_id)
+    notificacion.leido = False
+    notificacion.save()
+
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return JsonResponse({'status': 'ok', 'leido': False})
+
+    return redirect('residente_notificaciones')
 
 
 # ---------------------------
@@ -2028,13 +2182,22 @@ def organizador_notificaciones(request):
     if not usuario:
         return redirect("login")
 
+    filtro = request.GET.get('filtro', 'todas')
     notificaciones = Notificacion.objects.filter(
         usuario_id=usuario.id_usuario
-    ).order_by('-fecha_envio')
+    )
+
+    if filtro == 'leidas':
+        notificaciones = notificaciones.filter(leido=True)
+    elif filtro == 'no_leidas':
+        notificaciones = notificaciones.filter(leido=False)
+
+    notificaciones = notificaciones.order_by('-fecha_envio')
 
     return render(request, "organizador/notificaciones.html", {
         "usuario": usuario,
-        "notificaciones": notificaciones
+        "notificaciones": notificaciones,
+        "filtro_actual": filtro
     })
 
 

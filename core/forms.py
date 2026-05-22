@@ -81,8 +81,28 @@ class NotificacionForm(forms.ModelForm):
 
     class Meta:
         model = Notificacion
-        fields = ["usuario", "tipo", "mensaje"]
+        fields = ["usuario", "tipo", "mensaje", "leido"]
         widgets = {
             "tipo": forms.TextInput(attrs={"class": "form-control"}),
             "mensaje": forms.Textarea(attrs={"class": "form-control", "rows": 4}),
+            "leido": forms.CheckboxInput(attrs={"class": "form-check-input"}),
         }
+
+
+from .models import Jornada, Recordatorio, Inscripcion
+
+class RecordatorioForm(forms.Form):
+    periodicidad = forms.ChoiceField(
+        choices=Recordatorio.PERIODICIDAD_CHOICES,
+        label="Periodicidad de recordatorio",
+        widget=forms.Select(attrs={"class": "form-control"})
+    )
+    jornada = forms.ModelChoiceField(
+        queryset=Jornada.objects.exclude(estado__in=['cancelada', 'finalizada']),
+        label="Jornada",
+        widget=forms.Select(attrs={"class": "form-control"})
+    )
+    activo = forms.BooleanField(
+        label="Activo",
+        required=False
+    )

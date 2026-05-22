@@ -83,6 +83,7 @@
                 <th>Usuario</th>
                 <th>Tipo</th>
                 <th>Mensaje</th>
+                <th>Estado</th>
                 <th>Fecha</th>
             </tr>
 
@@ -91,11 +92,18 @@
                 <td>{{ n.usuario.nombre }}</td>
                 <td>{{ n.tipo|capfirst }}</td>
                 <td>{{ n.mensaje }}</td>
+                <td>
+                    {% if n.leido %}
+                        <span style="color: #27ae60; font-weight: 500;">✓ Leída</span>
+                    {% else %}
+                        <span style="color: #e74c3c; font-weight: 500;">● No leída</span>
+                    {% endif %}
+                </td>
                 <td>{{ n.fecha_envio|date:"d/m/Y H:i" }}</td>
             </tr>
             {% empty %}
             <tr>
-                <td colspan="4">No hay notificaciones</td>
+                <td colspan="5">No hay notificaciones</td>
             </tr>
             {% endfor %}
         </table>

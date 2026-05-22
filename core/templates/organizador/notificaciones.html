@@ -8,13 +8,13 @@
 {% block cuerpo %}
 
 <style>
-/* ======== ESTILOS DE NOTIFICACIONES (COMPATIBLE CON estilos_residentes.css) ======== */
+/* ======== ESTILOS DE NOTIFICACIONES ======== */
 
 .notificaciones-wrapper {
     max-width: 900px;
-    margin: 100px auto 40px; /* el margin-top compensa el header */
+    margin: 100px auto 40px;
     padding: 0 20px;
-    padding-bottom: 500px; /* espacio para que el footer quede abajo */
+    padding-bottom: 100px;
 }
 
 h2 {
@@ -23,7 +23,30 @@ h2 {
     margin-bottom: 25px;
 }
 
-/* Contenedor general */
+.filtros-notificaciones {
+    margin-bottom: 20px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.filtro-btn {
+    padding: 8px 16px;
+    border: 2px solid var(--primary);
+    background: transparent;
+    color: var(--primary);
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.filtro-btn:hover,
+.filtro-btn.activo {
+    background: var(--primary);
+    color: white;
+}
+
 .notificaciones-container {
     margin-top: 20px;
     display: flex;
@@ -31,7 +54,6 @@ h2 {
     gap: 18px;
 }
 
-/* Tarjeta */
 .notificacion {
     background: white;
     padding: 18px 20px;
@@ -41,30 +63,77 @@ h2 {
     transition: transform .2s ease, box-shadow .2s ease;
 }
 
+.notificacion.no-leida {
+    border-left-color: #e74c3c;
+    background: #fff5f5;
+}
+
 .notificacion:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 18px rgba(0,0,0,0.12);
 }
 
-/* Título del tipo */
 .notificacion strong {
     font-size: 1.15rem;
     color: var(--secondary);
 }
 
-/* Mensaje */
+.notificacion.no-leida strong {
+    color: #c0392b;
+}
+
 .notificacion p {
     margin: 10px 0 6px;
     color: var(--muted);
     font-size: 0.95rem;
 }
 
-/* Fecha */
-.notificacion span {
+.notificacion span.fecha {
     display: inline-block;
     margin-top: 4px;
     font-size: 0.8rem;
     color: #7d8a88;
+}
+
+.badge-no-leida {
+    display: inline-block;
+    background: #e74c3c;
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+}
+
+.acciones-notificacion {
+    margin-top: 10px;
+}
+
+.btn-estado {
+    padding: 4px 12px;
+    border: none;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-marcar {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-marcar:hover {
+    background: var(--secondary);
+}
+
+.btn-desmarcar {
+    background: #95a5a6;
+    color: white;
+}
+
+.btn-desmarcar:hover {
+    background: #7f8c8d;
 }
 </style>
 
@@ -75,18 +144,38 @@ h2 {
 <div class="notificaciones-wrapper">
     <h2>📬 Mis Notificaciones</h2>
 
+    <!-- Filtros -->
+    <div class="filtros-notificaciones">
+        <a href="?filtro=todas" class="filtro-btn {% if filtro_actual == 'todas' %}activo{% endif %}">Todas</a>
+        <a href="?filtro=no_leidas" class="filtro-btn {% if filtro_actual == 'no_leidas' %}activo{% endif %}">No leídas</a>
+        <a href="?filtro=leidas" class="filtro-btn {% if filtro_actual == 'leidas' %}activo{% endif %}">Leídas</a>
+    </div>
+
     <div class="notificaciones-container">
         {% if notificaciones %}
             {% for n in notificaciones %}
-                <div class="notificacion">
-                    <strong>{{ n.tipo }}</strong>
+                <div class="notificacion {% if not n.leido %}no-leida{% endif %}">
+                    <strong>{{ n.tipo }}
+                        {% if not n.leido %}
+                            <span class="badge-no-leida">NUEVO</span>
+                        {% endif %}
+                    </strong>
                     <p>{{ n.mensaje }}</p>
-                    <span>{{ n.fecha_envio|date:"d/m/Y H:i" }}</span>
+                    <span class="fecha">{{ n.fecha_envio|date:"d/m/Y H:i" }}</span>
+                    
+                    <div class="acciones-notificacion">
+                        {% if n.leido %}
+                            <span class="btn-estado" style="background: #27ae60; cursor: default;">✓ Leída</span>
+                        {% else %}
+                            <span class="btn-estado btn-marcar" style="opacity: 0.6; cursor: not-allowed;">Marcar como leída</span>
+                            <small style="color: #7f8c8d; margin-left: 8px;">(Funcionalidad próximamente)</small>
+                        {% endif %}
+                    </div>
                 </div>
             {% endfor %}
         {% else %}
             <p style="color: var(--muted); font-weight: 500;">
-                No tienes notificaciones por ahora.
+                No tienes notificaciones {% if filtro_actual == 'leidas' %}leídas{% elif filtro_actual == 'no_leidas' %}no leídas{% else %}{% endif %} por ahora.
             </p>
         {% endif %}
     </div>

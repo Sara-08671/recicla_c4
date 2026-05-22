@@ -219,6 +219,7 @@ class Notificacion(models.Model):
     mensaje = models.TextField(null=True, blank=True)
     fecha_envio = models.DateTimeField(auto_now_add=True)
     last_update = models.DateTimeField(auto_now=True)
+    leido = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'notificacion'
@@ -280,15 +281,52 @@ class ComentarioForo(models.Model):
 
 
 class DenunciaForo(models.Model):
-    tema = models.ForeignKey(TemaForo, on_delete=models.CASCADE, related_name='denuncias')
-    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    motivo = models.TextField()
-    fecha = models.DateTimeField(auto_now_add=True)
+     tema = models.ForeignKey(TemaForo, on_delete=models.CASCADE, related_name='denuncias')
+     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+     motivo = models.TextField()
+     fecha = models.DateTimeField(auto_now_add=True)
+
+     class Meta:
+         db_table = 'core_denuncia_foro'
+         unique_together = ('tema', 'usuario')  # Un usuario no puede denunciar dos veces
+
+     def __str__(self):
+         return f"Denuncia de {self.usuario} en {self.tema}"
+
+
+class Recordatorio(models.Model):
+    PERIODICIDAD_CHOICES = [
+        ('24h', '24 horas antes'),
+        ('1h', '1 hora antes'),
+        ('30min', '30 minutos antes'),
+    ]
+
+    id_recordatorio = models.AutoField(primary_key=True)
+    usuario = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        db_column='id_usuario',
+        related_name='recordatorios'
+    )
+    jornada = models.ForeignKey(
+        Jornada,
+        on_delete=models.CASCADE,
+        db_column='jornada_id',
+        related_name='recordatorios'
+    )
+    periodicidad = models.CharField(
+        max_length=10,
+        choices=PERIODICIDAD_CHOICES,
+        default='24h'
+    )
+    activo = models.BooleanField(default=True)
+    enviado = models.BooleanField(default=False)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    last_update = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'core_denuncia_foro'
-        unique_together = ('tema', 'usuario')  # Un usuario no puede denunciar dos veces
+        db_table = 'core_recordatorio'
 
     def __str__(self):
-        return f"Denuncia de {self.usuario} en {self.tema}"
+        return f"Recordatorio {self.id_recordatorio} - {self.usuario} - {self.jornada} ({self.periodicidad})"
 

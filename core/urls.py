@@ -43,9 +43,10 @@ urlpatterns = [
     path('administrador/puntaje/asignar/', views.asignar_puntaje, name='asignar_puntaje'),
     path('admi/perfil/', views.perfil_admin, name='perfil_admin'),
     path('admi/perfil/cambiar-foto/', views.cambiar_foto_admin, name='cambiar_foto_admin'),
-    path('admi/notificaciones/', views.admi_notificaciones, name='admi_notificaciones'),
-    path('admi/jornadas/modificar/<int:jornada_id>/', views.admi_modificar_jornada, name='admi_modificar_jornada'),
-    path('admi/jornadas/eliminar/<int:jornada_id>/', views.admi_eliminar_jornada, name='admi_eliminar_jornada'),
+path('admi/notificaciones/', views.admi_notificaciones, name='admi_notificaciones'),
+     path('admi/recordatorios/', views.recordatorio_gestion, name='recordatorio_gestion'),
+     path('admi/jornadas/modificar/<int:jornada_id>/', views.admi_modificar_jornada, name='admi_modificar_jornada'),
+     path('admi/jornadas/eliminar/<int:jornada_id>/', views.admi_eliminar_jornada, name='admi_eliminar_jornada'),
 
     # ORGANIZADOR
     path("organizador/asistencia/", views.organizador_asistencia, name="organizador_asistencia"),
@@ -77,9 +78,12 @@ urlpatterns = [
     path("residente/educacion/", views.residente_educacion, name="residente_educacion"),
     path("residente/contacto/", views.residente_contacto, name="residente_contacto"),
     path('residente/foro/publicaciones/', views.residente_foro_publicaciones, name='residente_foro_publicaciones'),
-    path('residente/configuracion/', views.residente_configuracion, name='residente_configuracion'),
-    path('residente/cambiar-foto/', views.cambiar_foto, name='cambiar_foto'),
-    path('residente/notificaciones/', views.residente_notificaciones, name='residente_notificaciones'),
+path('residente/configuracion/', views.residente_configuracion, name='residente_configuracion'),
+     path('residente/recordatorio-configuracion/', views.recordatorio_configuracion, name='recordatorio_configuracion'),
+     path('residente/cambiar-foto/', views.cambiar_foto, name='cambiar_foto'),
+     path('residente/notificaciones/', views.residente_notificaciones, name='residente_notificaciones'),
+     path('residente/notificaciones/<int:id_notificacion>/marcar-leida/', views.marcar_notificacion_leida, name='marcar_notificacion_leida'),
+     path('residente/notificaciones/<int:id_notificacion>/marcar-no-leida/', views.marcar_notificacion_no_leida, name='marcar_notificacion_no_leida'),
 
     # USUARIO
     path("usuario/como-participar/", views.usuario_como_participar, name="usuario_como_participar"),

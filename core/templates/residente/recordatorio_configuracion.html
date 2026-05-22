@@ -1,0 +1,214 @@
+{% extends "residente/base.html" %}
+{% load static %}
+
+{% block titulo %}Configurar Recordatorios{% endblock %}
+
+{% block cuerpo %}
+<link rel="stylesheet" href="{% static 'residente/css/estilos_residentes.css' %}">
+<link rel="stylesheet" href="{% static 'residente/css/recordatorio.css' %}">
+
+{% include 'residente/header.html' %}
+
+<div class="page-container">
+
+    <h2 class="config-title">🔔 Configurar Recordatorios de Jornadas</h2>
+
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- SECCIÓN 1: Recordatorios activos -->
+    <div class="config-card">
+        <h3>📋 Mis Recordatorios Activos</h3>
+        {% if recordatorios %}
+        <table class="recordatorios-table">
+            <thead>
+                <tr>
+                    <th>Jornada</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Periodicidad</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in recordatorios %}
+                <tr>
+                    <td>{{ r.jornada.titulo }}</td>
+                    <td>{{ r.jornada.fecha|date:"d/m/Y" }}</td>
+                    <td>{{ r.jornada.hora|time:"H:i" }}</td>
+                    <td>
+                        <span class="badge-{{ r.periodicidad }}">
+                            {% if r.periodicidad == '24h' %}24 horas antes{% elif r.periodicidad == '1h' %}1 hora antes{% elif r.periodicidad == '30min' %}30 min antes{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        {% if r.activo %}
+                        <span class="status-active">Activo</span>
+                        {% else %}
+                        <span class="status-inactive">Inactivo</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if r.activo %}
+                        <form method="POST" style="display:inline;" onsubmit="return confirm('¿Desactivar este recordatorio?');">
+                            {% csrf_token %}
+                            <input type="hidden" name="desactivar_recordatorio" value="1">
+                            <input type="hidden" name="recordatorio_id" value="{{ r.id_recordatorio }}">
+                            <button type="submit" class="btn-desactivar">Desactivar</button>
+                        </form>
+                        {% else %}
+                        <form method="POST" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="activar_recordatorio" value="1">
+                            <input type="hidden" name="recordatorio_id" value="{{ r.id_recordatorio }}">
+                            <button type="submit" class="btn-activar">Activar</button>
+                        </form>
+                        {% endif %}
+                        <button type="button" class="btn-editar" onclick="editarPeriodicidad({{ r.id_recordatorio }}, '{{ r.periodicidad }}')">✏️ Editar</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="no-recordatorios">No tienes recordatorios configurados.</p>
+        {% endif %}
+    </div>
+
+    <!-- SECCIÓN 2: Agregar nuevo recordatorio -->
+    <div class="config-card">
+        <h3>➕ Agregar Nuevo Recordatorio</h3>
+
+        {% if jornadas_sin_recordatorio %}
+        <form method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="jornada_id">Jornada</label>
+                <select name="jornada_id" id="jornada_id" class="form-control" required>
+                    <option value="">-- Seleccionar jornada --</option>
+                    {% for j in jornadas_sin_recordatorio %}
+                    <option value="{{ j.id_jornada }}">{{ j.titulo }} ({{ j.fecha|date:"d/m/Y" }} - {{ j.hora|time:"H:i" }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="periodicidad">Periodicidad del Recordatorio</label>
+                <select name="periodicidad" id="periodicidad" class="form-control" required>
+                    <option value="">-- Seleccionar periodicidad --</option>
+                    <option value="24h">24 horas antes de la jornada</option>
+                    <option value="1h">1 hora antes de la jornada</option>
+                    <option value="30min">30 minutos antes de la jornada</option>
+                </select>
+            </div>
+
+            <button type="submit" name="guardar_recordatorio" value="1" class="btn-guardar">🔔 Configurar Recordatorio</button>
+        </form>
+        {% else %}
+        <p class="no-jornadas">No tienes jornadas inscritas disponibles para configurar recordatorios.</p>
+        {% endif %}
+    </div>
+
+    <!-- SECCIÓN 3: Información -->
+    <div class="config-card info-card">
+        <h3>ℹ️ ¿Cómo funcionan los recordatorios?</h3>
+        <ul class="info-list">
+            <li>Los recordatorios se enviarán por <strong>correo electrónico</strong> y como <strong>notificación en el sistema</strong>.</li>
+            <li>Puedes elegir entre <strong>24 horas</strong>, <strong>1 hora</strong> o <strong>30 minutos</strong> antes de la jornada.</li>
+            <li>Los recordatorios solo se envían si la jornada aún está <strong>activa</strong> y tú estás <strong>inscrito</strong>.</li>
+            <li>Puedes activar o desactivar cada recordatorio en cualquier momento.</li>
+            <li>Puedes modificar la periodicidad de los recordatorios existentes usando el botón ✏️ Editar.</li>
+        </ul>
+    </div>
+
+</div>
+
+<!-- Modal para editar periodicidad -->
+<div id="modalEditar" class="modal" style="display:none;">
+    <div class="modal-content">
+        <span class="close" onclick="cerrarModal()">&times;</span>
+        <h3>✏️ Editar Periodicidad</h3>
+        <form method="POST">
+            {% csrf_token %}
+            <input type="hidden" name="modificar_recordatorio" value="1">
+            <input type="hidden" name="recordatorio_id" id="edit_recordatorio_id">
+            
+            <div class="form-group">
+                <label for="nueva_periodicidad">Nueva Periodicidad</label>
+                <select name="periodicidad" id="nueva_periodicidad" class="form-control" required>
+                    <option value="24h">24 horas antes de la jornada</option>
+                    <option value="1h">1 hora antes de la jornada</option>
+                    <option value="30min">30 minutos antes de la jornada</option>
+                </select>
+            </div>
+            
+            <button type="submit" class="btn-guardar">Guardar Cambios</button>
+        </form>
+    </div>
+</div>
+
+<style>
+.modal {
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+}
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    position: relative;
+}
+.close {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 28px;
+    cursor: pointer;
+}
+.btn-editar {
+    background: #3498db;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+.btn-editar:hover {
+    background: #2980b9;
+}
+</style>
+
+<script>
+function editarPeriodicidad(id, periodicidad) {
+    document.getElementById('edit_recordatorio_id').value = id;
+    document.getElementById('nueva_periodicidad').value = periodicidad;
+    document.getElementById('modalEditar').style.display = 'block';
+}
+function cerrarModal() {
+    document.getElementById('modalEditar').style.display = 'none';
+}
+window.onclick = function(event) {
+    var modal = document.getElementById('modalEditar');
+    if (event.target == modal) {
+        modal.style.display = 'none';
+    }
+}
+</script>
+
+{% include 'residente/footer.html' %}
+{% endblock %}

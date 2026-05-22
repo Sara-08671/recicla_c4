@@ -1,0 +1,255 @@
+/* ===== RECORDATORIO STYLES ===== */
+
+.config-title {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 1.8rem;
+    color: #2c3e50;
+}
+
+/* Recordatorios Table */
+.recordatorios-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.recordatorios-table thead {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.recordatorios-table th,
+.recordatorios-table td {
+    padding: 14px 18px;
+    text-align: left;
+    font-size: 0.95rem;
+}
+
+.recordatorios-table tbody tr {
+    border-bottom: 1px solid #eee;
+    transition: background 0.2s;
+}
+
+.recordatorios-table tbody tr:hover {
+    background: #f8f9ff;
+}
+
+.recordatorios-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.recordatorios-table .row-inactive {
+    opacity: 0.55;
+}
+
+/* Badges for periodicidad */
+.badge-24h {
+    background: #e3f2fd;
+    color: #1565c0;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.badge-1h {
+    background: #fff3e0;
+    color: #e65100;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.badge-30min {
+    background: #fce4ec;
+    color: #c62828;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+/* Status labels */
+.status-active, .status-enviado {
+    color: #2e7d32;
+    font-weight: 600;
+}
+
+.status-inactive, .status-pendiente {
+    color: #999;
+    font-weight: 600;
+}
+
+/* No recordatorios message */
+.no-recordatorios, .no-jornadas {
+    text-align: center;
+    color: #999;
+    font-size: 1.05rem;
+    padding: 40px 20px;
+    font-style: italic;
+}
+
+/* Form styles within config cards */
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: border-color 0.3s;
+    background: #fff;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.btn-guardar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    margin-top: 10px;
+}
+
+.btn-guardar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.btn-activar {
+    background: #2e7d32;
+    color: white;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.btn-activar:hover {
+    background: #388e3c;
+}
+
+.btn-desactivar {
+    background: #c62828;
+    color: white;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.btn-desactivar:hover {
+    background: #d32f2f;
+}
+
+/* Info card */
+.info-card {
+    background: #f0f4ff;
+    border-left: 4px solid #667eea;
+}
+
+.info-list {
+    list-style: none;
+    padding: 0;
+}
+
+.info-list li {
+    padding: 8px 0;
+    color: #333;
+    line-height: 1.5;
+}
+
+.info-list li::before {
+    content: "✔ ";
+    color: #2e7d32;
+    font-weight: bold;
+}
+
+/* Filtros bar */
+.filtros-bar {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: flex-start;
+}
+
+.filtros-form {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.filtros-form label {
+    font-weight: 600;
+    color: #333;
+}
+
+.filtros-form select {
+    padding: 8px 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.9rem;
+}
+
+.btn-filtrar {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.btn-filtrar:hover {
+    background: #5a6fd6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .recordatorios-table {
+        font-size: 0.85rem;
+    }
+
+    .recordatorios-table th,
+    .recordatorios-table td {
+        padding: 10px 12px;
+    }
+
+    .filtros-bar {
+        flex-direction: column;
+    }
+
+    .filtros-form {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

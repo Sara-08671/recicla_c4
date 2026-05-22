@@ -1,0 +1,91 @@
+{% extends "administrador/base.html" %}
+{% load static %}
+
+{% block titulo %}Gestión de Recordatorios{% endblock %}
+
+{% block cuerpo %}
+<link rel="stylesheet" href="{% static 'administrador/css/estilos.css' %}">
+<link rel="stylesheet" href="{% static 'administrador/css/recordatorio.css' %}">
+
+{% include 'administrador/header.html' %}
+
+<div class="page-container">
+
+    <h2 class="config-title">🔔 Gestión de Recordatorios</h2>
+
+    {% if messages %}
+    <div class="messages-container">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Filtros -->
+    <div class="filtros-bar">
+        <form method="GET" class="filtros-form">
+            <label for="estado">Estado:</label>
+            <select name="estado" id="estado">
+                <option value="">Todos</option>
+                <option value="activo" {% if estado_filtro == 'activo' %}selected{% endif %}>Activos</option>
+                <option value="inactivo" {% if estado_filtro == 'inactivo' %}selected{% endif %}>Inactivos</option>
+            </select>
+            <button type="submit" class="btn-filtrar">Filtrar</button>
+        </form>
+    </div>
+
+    <!-- Tabla de recordatorios -->
+    <div class="config-card">
+        <h3>📋 Lista de Recordatorios</h3>
+        {% if recordatorios %}
+        <table class="recordatorios-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Usuario</th>
+                    <th>Jornada</th>
+                    <th>Periodicidad</th>
+                    <th>Enviado</th>
+                    <th>Activo</th>
+                    <th>Creado</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in recordatorios %}
+                <tr class="{% if not r.activo %}row-inactive{% endif %}">
+                    <td>{{ r.id_recordatorio }}</td>
+                    <td>{{ r.usuario.nombre }} {{ r.usuario.apellido }}</td>
+                    <td>{{ r.jornada.titulo }}</td>
+                    <td>
+                        <span class="badge-{{ r.periodicidad }}">
+                            {% if r.periodicidad == '24h' %}24h{% elif r.periodicidad == '1h' %}1h{% elif r.periodicidad == '30min' %}30min{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        {% if r.enviado %}
+                        <span class="status-enviado">Enviado</span>
+                        {% else %}
+                        <span class="status-pendiente">Pendiente</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if r.activo %}
+                        <span class="status-active">Activo</span>
+                        {% else %}
+                        <span class="status-inactive">Inactivo</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ r.fecha_creacion|date:"d/m/Y H:i" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p class="no-recordatorios">No hay recordatorios registrados.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+{% include 'administrador/footer.html' %}
+{% endblock %}
