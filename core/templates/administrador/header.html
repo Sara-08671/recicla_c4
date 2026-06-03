@@ -18,28 +18,29 @@
     </div>
   </div>
 
-  <nav class="header-right">
-    <ul>
-      <li><a href="{% url 'admi_inicio' %}">🏠 Inicio</a></li>
-      <li><a href="{% url 'admi_educacion' %}">🌟 Educación</a></li>
+    <nav class="header-right">
+      <ul>
+        <li><a href="{% url 'admi_inicio' %}">🏠 Inicio</a></li>
+        <li><a href="{% url 'admi_educacion' %}">🌟 Educación</a></li>
 
-      <li class="submenu-parent">
-        <a href="javascript:void(0);" class="submenu-toggle">
-          💬 Foro <i class="fas fa-chevron-down"></i>
-        </a>
-        <ul class="submenu">
-  <li><a href="{% url 'admi_creacion_jornadas' %}">📝 Formulario de Jornada</a></li>
-  <li><a href="{% url 'admi_asistencia' %}">📝 Registro de asistencia</a></li>
-  <li><a href="{% url 'admi_validar_acciones' %}">⭐ Validar Acciones Destacadas</a></li>
-  <li><a href="{% url 'admi_recoleccion' %}">📝 Registro de recolección</a></li>
-</ul>
-      </li>
+        <li class="submenu-parent">
+          <a href="javascript:void(0);" class="submenu-toggle">
+            💬 Foro <i class="fas fa-chevron-down"></i>
+          </a>
+          <ul class="submenu">
+    <li><a href="{% url 'admi_creacion_jornadas' %}">📝 Formulario de Jornada</a></li>
+    <li><a href="{% url 'admi_asistencia' %}">📝 Registro de asistencia</a></li>
+    <li><a href="{% url 'admi_validar_acciones' %}">⭐ Validar Acciones Destacadas</a></li>
+    <li><a href="{% url 'admi_recoleccion' %}">📝 Registro de recolección</a></li>
+  </ul>
+        </li>
 
-      <li><a href="{% url 'admi_contacto' %}">✉️ Contacto</a></li>
+        <li><a href="{% url 'admi_contacto' %}">✉️ Contacto</a></li>
+        <li><a href="{% url 'bandeja_entrada' %}">💬 Mensajes <span class="notification-badge" id="mensaje-badge">0</span></a></li>
 
-      <li><a href="{% url 'perfil_admin' %}" class="btn-profile">Perfil <i class="fas fa-user-circle"></i></a></li>
-    </ul>
-  </nav>
+        <li><a href="{% url 'perfil_admin' %}" class="btn-profile">Perfil <i class="fas fa-user-circle"></i></a></li>
+      </ul>
+    </nav>
 </header>
 
 {% if messages %}
@@ -55,32 +56,33 @@
 <!-- Overlay -->
 <div id="overlay" aria-hidden="true"></div>
 
-<!-- Menú Lateral -->
-<aside class="sidebar" id="sidebar" aria-hidden="true" role="navigation">
-  <div class="close">
-      <button id="closeSidebar" aria-label="Cerrar menú" class="btn-close">
+    <!-- Menú Lateral -->
+    <aside class="sidebar" id="sidebar" aria-hidden="true" role="navigation">
+      <div class="close">
+          <button id="closeSidebar" aria-label="Cerrar menú" class="btn-close">
+      
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
 
-      <i class="fas fa-times"></i>
-    </button>
-  </div>
+      <ul>
+        <li class="submenu-parent">
+          <a href="#" class="submenu-toggle" id="toggle-jornadas">📅 Jornadas <i class="fas fa-chevron-down"></i></a>
+          <ul class="submenu">
+            <li><a href="{% url 'admi_creacion_jornadas' %}">📝 Formulario de Jornada</a></li>
+            <li><a href="{% url 'admi_asistencia' %}">📝 Registro de asistencia</a></li>
+            <li><a href="{% url 'admi_recoleccion' %}">📝 Registro de recolección</a></li>
+          </ul>
+        </li>
 
-  <ul>
-    <li class="submenu-parent">
-      <a href="#" class="submenu-toggle" id="toggle-jornadas">📅 Jornadas <i class="fas fa-chevron-down"></i></a>
-      <ul class="submenu">
-        <li><a href="{% url 'admi_creacion_jornadas' %}">📝 Formulario de Jornada</a></li>
-        <li><a href="{% url 'admi_asistencia' %}">📝 Registro de asistencia</a></li>
-        <li><a href="{% url 'admi_recoleccion' %}">📝 Registro de recolección</a></li>
+        <li><a href="{% url 'admi_recompensa' %}">🎁 Recompensas</a></li>
+        <li><a href="{% url 'admi_notificaciones' %}">🔔 Notificaciones</a></li>
+        <li><a href="{% url 'bandeja_entrada' %}">💬 Mensajes</a></li>
+        <li><a href="{% url 'panel_usuarios' %}">👥 Usuarios</a></li>
+        <li><a href="{% url 'admi_configuracion' %}">⚙️ Configuración</a></li>
       </ul>
-    </li>
 
-    <li><a href="{% url 'admi_recompensa' %}">🎁 Recompensas</a></li>
-    <li><a href="{% url 'admi_notificaciones' %}">🔔 Notificaciones</a></li>
-    <li><a href="{% url 'panel_usuarios' %}">👥 Usuarios</a></li>
-    <li><a href="{% url 'admi_configuracion' %}">⚙️ Configuración</a></li>
-  </ul>
-
-  <a href="{% url 'logout' %}">Cerrar sesión</a>
-</aside>
+      <a href="{% url 'logout' %}">Cerrar sesión</a>
+    </aside>
 
 {% endblock %}

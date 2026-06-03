@@ -11,6 +11,18 @@ urlpatterns = [
     path("logout/", views.logout_view, name="logout"),
     path("google/login/", views.google_login, name="google_login"),
     path("google/callback/", views.google_callback, name="google_callback"),
+    path("solicitar-cambio-rol/", views.solicitar_cambio_rol, name="solicitar_cambio_rol"),
+    path("solicitudes-cambio-rol/", views.solicitudes_cambio_rol, name="solicitudes_cambio_rol"),
+    
+    # MENSAJERÍA
+    path("mensajeria/", views.bandeja_entrada, name="bandeja_entrada"),
+    path("mensajeria/enviar/", views.enviar_mensaje, name="enviar_mensaje"),
+    path("mensajeria/ver/<int:mensaje_id>/", views.ver_mensaje, name="ver_mensaje"),
+    path("mensajeria/salida/", views.bandeja_salida, name="bandeja_salida"),
+    path("mensajeria/eliminar/<int:mensaje_id>/", views.eliminar_mensaje, name="eliminar_mensaje"),
+    path("mensajeria/privacidad/", views.configurar_privacidad, name="configurar_privacidad"),
+    path("mensajeria/verificar-conexion/", views.verificar_ultima_conexion, name="verificar_ultima_conexion"),
+    path("mensajeria/contar-no-leidos/", views.contar_mensajes_no_leidos, name="contar_mensajes_no_leidos"),
     
     # PANEL PRINCIPAL POR ROL
     path("panel/admin/", views.admin_panel, name="admin_panel"),

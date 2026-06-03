@@ -46,6 +46,7 @@ from .forms import PasswordResetRequestForm
 from .models import Notificacion
 from .validators import validar_contrasena_segura, validar_mayor_14_annos
 from django.core.exceptions import ValidationError
+import requests
 
 
 # ---------------------------
@@ -541,20 +542,317 @@ def verify_email(request, token):
         messages.info(request, "Tu cuenta ya estaba verificada. Ya puedes iniciar sesión.")
         return redirect("login")
 
-    usuario.verificado = True
-    usuario.fecha_verificacion = timezone.now()
-    usuario.token_verificacion = None
+     usuario.verificado = True
+     usuario.fecha_verificacion = timezone.now()
+     usuario.token_verificacion = None
 
-    if usuario.rol == "residente":
-        usuario.estado = "activo"
+     if usuario.rol == "residente":
+         usuario.estado = "activo"
 
-    usuario.save()
+     usuario.save()
 
-    if usuario.rol == "residente":
-        messages.success(request, "✅ ¡Cuenta verificada correctamente! Ya puedes iniciar sesión.")
+     if usuario.rol == "residente":
+         messages.success(request, "✅ ¡Cuenta verificada correctamente! Ya puedes iniciar sesión.")
+     else:
+         messages.success(request, "✅ ¡Cuenta verificada! Espera a que un administrador apruebe tu solicitud.")
+     return redirect("login")
+
+
+# GOOGLE OAUTH
+def google_login(request):
+    """Inicia el flujo de autenticación con Google"""
+    from django.conf import settings
+    from urllib.parse import urlencode
+    
+    # Parámetros para la autorización de Google
+    params = {
+        'client_id': settings.GOOGLE_OAUTH_CLIENT_ID,
+        'redirect_uri': settings.GOOGLE_OAUTH_REDIRECT_URI,
+        'scope': 'openid email profile',
+        'response_type': 'code',
+        'access_type': 'offline',
+        'prompt': 'consent',
+    }
+    
+    auth_url = f"https://accounts.google.com/o/oauth2/auth?{urlencode(params)}"
+    return redirect(auth_url)
+
+
+def google_callback(request):
+    """Maneja la callback de Google después de la autenticación"""
+    from django.conf import settings
+    from django.shortcuts import redirect
+    from django.contrib import messages
+    from django.urls import reverse
+    import requests
+    
+    code = request.GET.get('code')
+    if not code:
+        messages.error(request, "Error de autenticación con Google.")
+        return redirect('login')
+    
+    # Intercambiar el código por un token de acceso
+    token_url = "https://oauth2.googleapis.com/token"
+    token_data = {
+        'client_id': settings.GOOGLE_OAUTH_CLIENT_ID,
+        'client_secret': settings.GOOGLE_OAUTH_CLIENT_SECRET,
+        'code': code,
+        'grant_type': 'authorization_code',
+        'redirect_uri': settings.GOOGLE_OAUTH_REDIRECT_URI,
+    }
+    
+    try:
+        token_response = requests.post(token_url, data=token_data)
+        token_response.raise_for_status()
+        token_json = token_response.json()
+        
+        access_token = token_json.get('access_token')
+        if not access_token:
+            messages.error(request, "No se pudo obtener el token de acceso de Google.")
+            return redirect('login')
+        
+        # Obtener información del usuario de Google
+        user_info_response = requests.get(
+            'https://www.googleapis.com/oauth2/v2/userinfo',
+            headers={'Authorization': f'Bearer {access_token}'}
+        )
+        user_info_response.raise_for_status()
+        google_data = user_info_response.json()
+        
+        email = google_data.get('email')
+        name = google_data.get('name', '')
+        verified_email = google_data.get('verified_email', False)
+        
+        if not email:
+            messages.error(request, "No se pudo obtener el correo electrónico de Google.")
+            return redirect('login')
+        
+        # Buscar o crear usuario
+        try:
+            usuario = Usuario.objects.get(correo=email)
+            # Actualizar nombre si cambió
+            if name:
+                nombre_partes = name.split(' ', 1)
+                if len(nombre_partes) == 2:
+                    usuario.nombre, usuario.apellido = nombre_partes
+                else:
+                    usuario.nombre = nombre_partes[0]
+                    usuario.apellido = ''
+                usuario.save()
+        except Usuario.DoesNotExist:
+            # Crear nuevo usuario desde datos de Google
+            nombre_partes = name.split(' ', 1)
+            if len(nombre_partes) == 2:
+                nombre, apellido = nombre_partes
+            else:
+                nombre = nombre_partes[0] if nombre_partes else ''
+                apellido = ''
+            
+            usuario = Usuario.objects.create(
+                nombre=nombre,
+                apellido=apellido,
+                correo=email,
+                # Generar una contraseña aleatoria (no se usará para login con Google)
+                contrasena=Usuario.make_random_password(),
+                rol='residente',  # Rol por defecto
+                estado='activo' if verified_email else 'pendiente',  # Activo si Google verificó el email
+                verificado=verified_email,  # Marcar como verificado si Google lo verificó
+                fecha_nacimiento=None,
+                barrio='',
+            )
+            
+            # Si no es verificado por Google, enviar email de verificación
+            if not verified_email:
+                token_verificacion = get_random_string(64)
+                usuario.token_verificacion = token_verificacion
+                usuario.save()
+                
+                dominio = get_current_site(request).domain
+                verificar_url = f"http://{dominio}/verify_email/{token_verificacion}/"
+                
+                mensaje_verificacion = f"""
+                Hola {usuario.nombre}!
+                
+                Gracias por registrarte en Recicla Comuna 4.
+                
+                Por favor, verifica tu correo haciendo clic en el siguiente enlace:
+                
+                {verificar_url}
+                
+                Este enlace expira en 24 horas.
+                
+                Saludos,
+                Equipo Recicla Comuna 4
+                """
+                
+                send_mail(
+                    subject="✅ Verifica tu correo - Recicla Comuna 4",
+                    message=mensaje_verificacion,
+                    from_email="reciclacomuna@gmail.com",
+                    recipient_list=[email],
+                    fail_silently=False,
+                )
+        
+        # Verificar que el usuario pueda acceder
+        if not usuario.puede_acceder():
+            if usuario.estado == 'pendiente':
+                messages.warning(request, "Tu cuenta está pendiente de aprobación por un administrador.")
+            elif usuario.estado == 'rechazado':
+                messages.error(request, "Tu solicitud fue rechazada.")
+            return redirect('login')
+        
+        # Iniciar sesión
+        request.session["usuario_id"] = usuario.id_usuario
+        request.session["usuario_nombre"] = usuario.nombre
+        request.session["usuario_rol"] = usuario.rol
+        
+        # Redirección por rol
+        if usuario.rol == "administrador":
+            return redirect("admi_inicio")
+        elif usuario.rol == "organizador":
+            return redirect("organizador_inicio")
+        else:
+            return redirect("residente_inicio")
+            
+    except requests.exceptions.RequestException as e:
+        messages.error(request, f"Error de comunicación con Google: {str(e)}")
+        return redirect('login')
+     except Exception as e:
+         messages.error(request, f"Error durante la autenticación: {str(e)}")
+         return redirect('login')
+
+
+# SOLICITUD DE CAMBIO DE ROL
+@rol_required('administrador')
+def solicitudes_cambio_rol(request):
+    """Vista para ver solicitudes de cambio de rol pendientes"""
+    if not request.session.get("usuario_id"):
+        return redirect("login")
+
+    usuario_actual = Usuario.objects.get(id_usuario=request.session["usuario_id"])
+    if usuario_actual.rol != "administrador":
+        messages.error(request, "No tienes permisos para ver esta página.")
+        return redirect("admi_inicio")
+
+    # Obtener usuarios con solicitudes de cambio de rol pendientes
+    # En esta implementación, asumimos que un usuario tiene una solicitud pendiente
+    # si su rol actual es diferente al rol solicitado y está en estado pendiente
+    # Para simplificar, vamos a buscar usuarios en estado pendiente que no sean residentes
+    # (ya que los residentes pendientes serían nuevos registros)
+    pendientes = Usuario.objects.filter(
+        estado='pendiente'
+    ).exclude(
+        rol='residente'
+    )
+    
+    return render(request, "administrador/solicitudes_cambio_rol.html", {
+        'solicitudes': pendientes
+    })
+
+
+def solicitar_cambio_rol(request):
+    """Permite a un usuario solicitado un cambio de rol"""
+    if not request.session.get("usuario_id"):
+        return redirect("login")
+    
+    if request.method == "POST":
+        nuevo_rol = request.POST.get("nuevo_rol")
+        justificacion = request.POST.get("justificacion", "").strip()
+        
+        # Validar rol
+        if nuevo_rol not in ['organizador', 'administrador']:
+            messages.error(request, "Rol no válido.")
+            # Redirigir al perfil apropiado según el rol actual
+            usuario = Usuario.objects.get(id_usuario=request.session["usuario_id"])
+            if usuario.rol == "administrador":
+                return redirect("perfil_admin")
+            elif usuario.rol == "organizador":
+                return redirect("perfil_organizador")
+            else:
+                return redirect("perfil_residente")
+        
+        # Validar justificación
+        if not justificacion:
+            messages.error(request, "Debes proporcionar una justificación para el cambio de rol.")
+            # Redirigir al perfil apropiado según el rol actual
+            usuario = Usuario.objects.get(id_usuario=request.session["usuario_id"])
+            if usuario.rol == "administrador":
+                return redirect("perfil_admin")
+            elif usuario.rol == "organizador":
+                return redirect("perfil_organizador")
+            else:
+                return redirect("perfil_residente")
+        
+        usuario = Usuario.objects.get(id_usuario=request.session["usuario_id"])
+        
+        # Guardar el rol anterior para el mensaje y la notificación
+        rol_anterior = usuario.rol
+        
+        # Si ya tiene ese rol, no hacer nada
+        if usuario.rol == nuevo_rol:
+            messages.info(request, f"Ya tienes el rol de {nuevo_rol}.")
+            # Redirigir al perfil apropiado
+            if usuario.rol == "administrador":
+                return redirect("perfil_admin")
+            elif usuario.rol == "organizador":
+                return redirect("perfil_organizador")
+            else:
+                return redirect("perfil_residente")
+        
+        # Guardar la solicitud (en este caso, cambiamos el estado a pendiente y guardamos la justificación)
+        usuario.rol = nuevo_rol
+        usuario.estado = "pendiente"
+        usuario.justificacion = justificacion
+        usuario.save()
+        
+        # Notificar al admin
+        dominio = get_current_site(request).domain
+        aprobar_url = f"http://{dominio}/aprobar/{usuario.id_usuario}/"
+        rechazar_url = f"http://{dominio}/rechazar/{usuario.id_usuario}/"
+        
+        mensaje_admin = f"""
+        SOLICITUD DE CAMBIO DE ROL:
+        
+        📋 Información del usuario:
+        • Nombre: {usuario.nombre} {usuario.apellido}
+        • Correo: {usuario.correo}
+        • Rol actual: {rol_anterior}
+        • Nuevo rol solicitado: {nuevo_rol.upper()}
+        • Barrio: {usuario.barrio}
+        • Justificación: {justificacion}
+        • Fecha de solicitud: {timezone.now()}
+        
+        ⚡ Acciones disponibles:
+        
+        ✅ Aprobar cambio: {aprobar_url}
+        ❌ Rechazar cambio: {rechazar_url}
+        """
+        
+        send_mail(
+            subject=f"🔔 Solicitud de cambio a {nuevo_rol} - Recicla Comuna 4",
+            message=mensaje_admin,
+            from_email="reciclacomuna@gmail.com",
+            recipient_list=["reciclacomuna@gmail.com"],
+            fail_silently=False,
+        )
+        
+        messages.success(request, "✅ Solicitud de cambio de rol enviada. Espera aprobación del administrador.")
+        # Redirigir al perfil apropiado según el rol original (antes del cambio)
+        if rol_anterior == "administrador":
+            return redirect("perfil_admin")
+        elif rol_anterior == "organizador":
+            return redirect("perfil_organizador")
+        else:
+            return redirect("perfil_residente")
+    
+    # Si no es POST, redirigir al perfil apropiado según el rol actual
+    usuario = Usuario.objects.get(id_usuario=request.session["usuario_id"])
+    if usuario.rol == "administrador":
+        return redirect("perfil_admin")
+    elif usuario.rol == "organizador":
+        return redirect("perfil_organizador")
     else:
-        messages.success(request, "✅ ¡Cuenta verificada! Espera a que un administrador apruebe tu solicitud.")
-    return redirect("login")
+        return redirect("perfil_residente")
 
 
 # -------------------------
@@ -2354,3 +2652,420 @@ def foro_denunciar(request, tema_id):
         return JsonResponse({'mensaje': 'Ya habías denunciado esta publicación anteriormente.'})
 
     return JsonResponse({'mensaje': '✅ Denuncia enviada correctamente. La revisaremos pronto.'})
+
+
+# VISTAS DE MENSAJERÍA
+@rol_required('administrador')
+def bandeja_entrada(request):
+    """
+    Vista para mostrar la bandeja de entrada del usuario
+    """
+    if not request.session.get("usuario_id"):
+        return redirect("login")
+    
+    usuario = Usuario.objects.get(id_usuario=request.session["usuario_id"])
+    
+    # Obtener mensajes recibidos (no eliminados)
+    mensajes_recibidos = Mensaje.objects.filter(
+        destinatario=usuario,
+        eliminado=False
+    ).select_related('remitente', 'jornada').prefetch_related('estados')
+    
+    # Marcar mensajes como leídos al ver la bandeja
+    for mensaje in mensajes_recibidos:
+        estado, created = EstadoMensaje.objects.get_or_create(
+            mensaje=mensaje,
+            usuario=usuario
+        )
+        if not estado.leido:
+            estado.leido = True
+            estado.fecha_lectura = timezone.now()
+            # Agregar al historial de cambios
+            historial = list(estado.historial_cambios) if estado.historial_cambios else []
+            historial.append({
+                'fecha': timezone.now().isoformat(),
+                'cambio': 'no_leido -> leido',
+                'motivo': 'visualizacion_bandeja'
+            })
+            estado.historial_cambios = historial
+            estado.save()
+    
+    return render(request, "mensajeria/bandeja_entrada.html", {
+        'mensajes': mensajes_recibidos
+    })
+
+
+@rol_required('administrador')
+def enviar_mensaje(request):
+    """
+    Vista para enviar un nuevo mensaje
+    """
+    if not request.session.get("usuario_id"):
+        return redirect("login")
+    
+    if request.method == "POST":
+        destinatario_id = request.POST.get("destinatario_id")
+        contenido = request.POST.get("contenido", "").strip()
+        jornada_id = request.POST.get("jornada_id")
+        archivo = request.FILES.get("archivo")
+        
+        # Validaciones
+        if not destinatario_id:
+            messages.error(request, "Debes seleccionar un destinatario.")
+            return redirect("enviar_mensaje")
+        
+        if not contenido and not archivo:
+            messages.error(request, "El mensaje debe contener texto o un archivo adjunto.")
+            return redirect("enviar_mensaje")
+        
+        try:
+            remitente = Usuario.objects.get(id_usuario=request.session["usuario_id"])
+            destinatario = Usuario.objects.get(id_usuario=destinatario_id)
+        except Usuario.DoesNotExist:
+            messages.error(request, "Usuario no válido.")
+            return redirect("enviar_mensaje")
+        
+        # Verificar que ambos usuarios estén inscritos en la misma jornada activa
+        # (si se especificó una jornada)
+        if jornada_id:
+            try:
+                jornada = Jornada.objects.get(id_jornada=jornada_id)
+                # Verificar que la jornada esté activa o en curso
+                if jornada.estado not in ['activa', 'en_curso']:
+                    messages.error(request, "Solo puedes enviar mensajes en jornadas activas o en curso.")
+                    return redirect("enviar_mensaje")
+                
+                # Verificar que ambos usuarios estén inscritos en la jornada
+                inscripcion_remitente = Inscripcion.objects.filter(
+                    usuario=remitente,
+                    jornada=jornada,
+                    estado='activa'
+                ).exists()
+                
+                inscripcion_destinatario = Inscripcion.objects.filter(
+                    usuario=destinatario,
+                    jornada=jornada,
+                    estado='activa'
+                ).exists()
+                
+                if not (inscripcion_remitente and inscripcion_destinatario):
+                    messages.error(request, "Ambos usuarios deben estar inscritos en la misma jornada activa para enviar mensajes.")
+                    return redirect("enviar_mensaje")
+                    
+            except Jornada.DoesNotExist:
+                messages.error(request, "Jornada no válida.")
+                return redirect("enviar_mensaje")
+        else:
+            # Si no se especifica jornada, buscar una jornada activa común
+            jornadas_comunes = Jornada.objects.filter(
+                inscripcion__usuario=remitente,
+                inscripcion__usuario=destinatario,
+                inscripcion__estado='activa',
+                estado__in=['activa', 'en_curso']
+            ).distinct()
+            
+            if not jornadas_comunes.exists():
+                messages.error(request, "No puedes enviar mensajes porque no comparten una jornada activa.")
+                return redirect("enviar_mensaje")
+            
+            # Usar la primera jornada común activa
+            jornada = jornadas_comunes.first()
+        
+        # Validar tamaño del archivo (máximo 5 MB)
+        if archivo:
+            if archivo.size > 5 * 1024 * 1024:  # 5 MB
+                messages.error(request, "El archivo no puede superar los 5 MB.")
+                return redirect("enviar_mensaje")
+        
+        # Crear el mensaje
+        mensaje = Mensaje.objects.create(
+            remitente=remitente,
+            destinatario=destinatario,
+            jornada=jornada,
+            contenido=contenido,
+            archivo=archivo
+        )
+        
+        # Crear estados de lectura para ambos usuarios
+        # El remitente ya ha "leído" su propio mensaje
+        EstadoMensaje.objects.create(
+            mensaje=mensaje,
+            usuario=remitente,
+            leido=True,
+            fecha_lectura=timezone.now()
+        )
+        
+        # El destinatario comienza como no leído
+        EstadoMensaje.objects.create(
+            mensaje=mensaje,
+            usuario=destinatario,
+            leido=False
+        )
+        
+        # Notificar por email si es apropiado
+        try:
+            dominio = get_current_site(request).domain
+            mensaje_url = f"http://{dominio}/mensajeria/ver/{mensaje.id_mensaje}/"
+            
+            email_content = f"""
+            Hola {destinatario.nombre},
+            
+            Has recibido un nuevo mensaje de {remitente.nombre} {remitente.apellido} en Recicla Comuna 4.
+            
+            Para ver el mensaje, ingresa a: {mensaje_url}
+            
+            Saludos,
+            Equipo Recicla Comuna 4
+            """
+            
+            send_mail(
+                subject=f"💬 Nuevo mensaje de {remitente.nombre} - Recicla Comuna 4",
+                message=email_content,
+                from_email="reciclacomuna@gmail.com",
+                recipient_list=[destinatario.correo],
+                fail_silently=True,
+            )
+        except Exception:
+            # No fallamos si no podemos enviar el email
+            pass
+        
+        messages.success(request, "Mensaje enviado correctamente.")
+        return redirect("bandeja_entrada")
+    
+    # GET request - mostrar formulario para enviar mensaje
+    usuario = Usuario.objects.get(id_usuario=request.session["usuario_id"])
+    
+    # Obtener jornadas activas del usuario para el selector
+    jornadas_activas = Jornada.objects.filter(
+        inscripcion__usuario=usuario,
+        inscripcion__estado='activa',
+        estado__in=['activa', 'en_curso']
+    ).distinct()
+    
+    # Obtener usuarios con quienes comparte jornadas activas
+    usuarios_comparten_jornada = Usuario.objects.filter(
+        inscripcion__jornada__in=jornadas_activas,
+        inscripcion__estado='activa'
+    ).exclude(
+        id_usuario=usuario.id_usuario
+    ).distinct()
+    
+    return render(request, "mensajeria/enviar_mensaje.html", {
+        'jornadas': jornadas_activas,
+        'usuarios': usuarios_comparten_jornada
+    })
+
+
+def ver_mensaje(request, mensaje_id):
+    """
+    Vista para ver un mensaje específico
+    """
+    if not request.session.get("usuario_id"):
+        return redirect("login")
+    
+    try:
+        mensaje = Mensaje.objects.select_related('remitente', 'destinatario', 'jornada').get(
+            id_mensaje=mensaje_id
+        )
+    except Mensaje.DoesNotExist:
+        messages.error(request, "Mensaje no encontrado.")
+        return redirect("bandeja_entrada")
+    
+    usuario = Usuario.objects.get(id_usuario=request.session["usuario_id"])
+    
+    # Verificar que el usuario sea el destinatario o el remitente
+    if mensaje.destinatario != usuario and mensaje.remitente != usuario:
+        messages.error(request, "No tienes permiso para ver este mensaje.")
+        return redirect("bandeja_entrada")
+    
+    # Si el usuario es el destinatario, marcar como leído
+    if mensaje.destinatario == usuario:
+        estado, created = EstadoMensaje.objects.get_or_create(
+            mensaje=mensaje,
+            usuario=usuario
+        )
+        if not estado.leido:
+            estado.leido = True
+            estado.fecha_lectura = timezone.now()
+            # Agregar al historial de cambios
+            historial = list(estado.historial_cambios) if estado.historial_cambios else []
+            historial.append({
+                'fecha': timezone.now().isoformat(),
+                'cambio': 'no_leido -> leido',
+                'motivo': 'visualizacion_mensaje'
+            })
+            estado.historial_cambios = historial
+            estado.save()
+    
+    return render(request, "mensajeria/ver_mensaje.html", {
+        'mensaje': mensaje
+    })
+
+
+def bandeja_salida(request):
+    """
+    Vista para mostrar los mensajes enviados
+    """
+    if not request.session.get("usuario_id"):
+        return redirect("login")
+    
+    usuario = Usuario.objects.get(id_usuario=request.session["usuario_id"])
+    
+    # Ob mensajes enviados (no eliminados)
+    mensajes_enviados = Mensaje.objects.filter(
+        remitente=usuario,
+        eliminado=False
+    ).select_related('destinatario', 'jornada').prefetch_related('estados')
+    
+    return render(request, "mensajeria/bandeja_salida.html", {
+        'mensajes': mensajes_enviados
+    })
+
+
+def eliminar_mensaje(request, mensaje_id):
+    """
+    Vista para eliminar un mensaje (soft delete)
+    """
+    if not request.session.get("usuario_id"):
+        return redirect("login")
+    
+    if request.method != "POST":
+        return redirect("bandeja_entrada")
+    
+    try:
+        mensaje = Mensaje.objects.get(id_mensaje=mensaje_id)
+    except Mensaje.DoesNotExist:
+        messages.error(request, "Mensaje no encontrado.")
+        return redirect("bandeja_entrada")
+    
+    usuario = Usuario.objects.get(id_usuario=request.session["usuario_id"])
+    
+    # Solo el remitente o destinatario pueden eliminar su copia
+    if mensaje.remitente != usuario and mensaje.destinatario != usuario:
+        messages.error(request, "No tienes permiso para eliminar este mensaje.")
+        return redirect("bandeja_entrada")
+    
+    # Soft delete - marcar como eliminado para este usuario
+    # En una implementación más completa, tendríamos una tabla de eliminación por usuario
+    # Pero por simplicidad, vamos a eliminar completamente si ambos usuarios lo eliminan
+    # Por ahora, vamos a marcar como eliminado globalmente (esto puede mejorarse)
+    mensaje.eliminado = True
+    mensaje.save()
+    
+    messages.success(request, "Mensaje eliminado correctamente.")
+    return redirect("bandeja_entrada")
+
+
+def configurar_privacidad(request):
+    """
+    Vista para configurar las opciones de privacidad
+    """
+    if not request.session.get("usuario_id"):
+        return redirect("login")
+    
+    usuario = Usuario.objects.get(id_usuario=request.session["usuario_id"])
+    
+    # Obtener o crear el objeto de privacidad
+    privacidad, created = PrivacidadUsuario.objects.get_or_create(
+        usuario=usuario
+    )
+    
+    if request.method == "POST":
+        ultima_conexion_visible = request.POST.get("ultima_conexion_visible") == "on"
+        
+        privacidad.ultima_conexion_visible = ultima_conexion_visible
+        privacidad.save()
+        
+        messages.success(request, "Configuración de privacidad actualizada correctamente.")
+        return redirect("configurar_privacidad")
+    
+    return render(request, "mensajeria/configurar_privacidad.html", {
+        'privacidad': privacidad
+    })
+
+
+def verificar_ultima_conexion(request):
+    """
+    Vista AJAX para verificar si se puede ver la última conexión de un usuario
+    """
+    if not request.session.get("usuario_id"):
+        return JsonResponse({'error': 'No autenticado'}, status=401)
+    
+    if request.method != "GET":
+        return JsonResponse({'error': 'Método no permitido'}, status=405)
+    
+    usuario_id = request.GET.get('usuario_id')
+    if not usuario_id:
+        return JsonResponse({'error': 'ID de usuario requerido'}, status=400)
+    
+    try:
+        usuario = Usuario.objects.get(id_usuario=usuario_id)
+        privacidad = PrivacidadUsuario.objects.get(usuario=usuario)
+        
+        # Verificar si comparten una jornada activa
+        usuario_actual = Usuario.objects.get(id_usuario=request.session["usuario_id"])
+        
+        jornadas_comunes = Jornada.objects.filter(
+            inscripcion__usuario=usuario_actual,
+            inscripcion__usuario=usuario,
+            inscripcion__estado='activa',
+            estado__in=['activa', 'en_curso']
+        ).exists()
+        
+        if not jornadas_comunes:
+            return JsonResponse({
+                'puede_ver': False,
+                'razon': 'No comparten una jornada activa'
+            })
+        
+        puede_ver = privacidad.ultima_conexion_visible
+        
+        return JsonResponse({
+            'puede_ver': puede_ver,
+            'ultima_conexion': privacidad.ultimo_acceso.isoformat() if puede_ver else None
+        })
+        
+    except (Usuario.DoesNotExist, PrivacidadUsuario.DoesNotExist):
+        return JsonResponse({'error': 'Usuario no encontrado'}, status=404)
+
+
+# Función de limpieza para mensajes antiguos (debe llamarse periódicamente)
+def limpiar_mensajes_antiguos():
+    """
+    Elimina mensajes cuyo historial sea mayor a 30 días después de finalizada la jornada
+    Esta función debería ejecutarse como una tarea periódica (celery, cron, etc.)
+    """
+    from datetime import timedelta
+    
+    fecha_limite = timezone.now() - timedelta(days=30)
+    
+    # Buscar mensajes de jornadas finalizadas hace más de 30 días
+    mensajes_antiguos = Mensaje.objects.filter(
+        jornada__estado='finalizada',
+        jornada__last_update__lt=fecha_limite
+    )
+    
+    count = mensajes_antiguos.count()
+    mensajes_antiguos.delete()
+    
+    return count
+
+
+def contar_mensajes_no_leidos(request):
+    """
+    Vista AJAX para obtener el número de mensajes no leídos
+    """
+    if not request.session.get("usuario_id"):
+        return JsonResponse({'count': 0})
+    
+    try:
+        usuario = Usuario.objects.get(id_usuario=request.session["usuario_id"])
+        count = EstadoMensaje.objects.filter(
+            mensaje__destinatario=usuario,
+            mensaje__eliminado=False,
+            leido=False
+        ).count()
+        
+        return JsonResponse({'count': count})
+    except Usuario.DoesNotExist:
+        return JsonResponse({'count': 0})

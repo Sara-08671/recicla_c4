@@ -330,3 +330,107 @@ class Recordatorio(models.Model):
     def __str__(self):
         return f"Recordatorio {self.id_recordatorio} - {self.usuario} - {self.jornada} ({self.periodicidad})"
 
+
+# MODELOS DE MENSAJERÍA
+class Mensaje(models.Model):
+    """
+    Modelo para almacenar los mensajes entre usuarios
+    """
+    id_mensaje = models.AutoField(primary_key=True)
+    remitente = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        related_name='mensajes_enviados',
+        db_column='id_remitente'
+    )
+    destinatario = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        related_name='mensajes_recibidos',
+        db_column='id_destinatario'
+    )
+    jornada = models.ForeignKey(
+        Jornada,
+        on_delete=models.CASCADE,
+        related_name='mensajes_jornada',
+        db_column='id_jornada',
+        null=True,
+        blank=True
+    )
+    contenido = models.TextField()  # Texto del mensaje
+    archivo = models.FileField(
+        upload_to='mensajes_archivos/',
+        null=True,
+        blank=True,
+        help_text="Archivo adjunto (máximo 5 MB)"
+    )
+    fecha_envio = models.DateTimeField(auto_now_add=True)
+    fecha_edicion = models.DateTimeField(null=True, blank=True)
+    editado = models.BooleanField(default=False)
+    eliminado = models.BooleanField(default=False)  # Para soft delete
+    
+    class Meta:
+        db_table = 'core_mensaje'
+        ordering = ['fecha_envio']
+
+    def __str__(self):
+        return f"Mensaje {self.id_mensaje} de {self.remitente} a {self.destinatario}"
+
+
+class EstadoMensaje(models.Model):
+    """
+    Modelo para almacenar el estado de lectura de cada mensaje por destinatario
+    """
+    mensaje = models.ForeignKey(
+        Mensaje,
+        on_delete=models.CASCADE,
+        related_name='estados'
+    )
+    usuario = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        related_name='estados_mensaje'
+    )
+    leido = models.BooleanField(default=False)
+    fecha_lectura = models.DateTimeField(null=True, blank=True)
+    
+    # Historial de cambios en estados de lectura (para seguridad)
+    historial_cambios = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Historial de cambios en el estado de lectura"
+    )
+    
+    class Meta:
+        db_table = 'core_estadomensaje'
+        unique_together = ('mensaje', 'usuario')
+        ordering = ['-fecha_lectura']
+
+    def __str__(self):
+        return f"Estado de {self.mensaje} para {self.usuario}: {'Leído' if self.leido else 'No leído'}"
+
+
+class PrivacidadUsuario(models.Model):
+    """
+    Modelo para almacenar las preferencias de privacidad de los usuarios
+    """
+    usuario = models.OneToOneField(
+        Usuario,
+        on_delete=models.CASCADE,
+        related_name='privacidad'
+    )
+    ultima_conexion_visible = models.BooleanField(
+        default=True,
+        help_text="Indica si la última conexión es visible para otros usuarios"
+    )
+    ultimo_acceso = models.DateTimeField(
+        auto_now=True,
+        help_text="Fecha y hora del último acceso del usuario"
+    )
+    
+    class Meta:
+        db_table = 'core_privacidadusuario'
+
+    def __str__(self):
+        return f"Privacidad de {self.usuario}"
+

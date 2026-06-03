@@ -1,0 +1,146 @@
+{% extends "administrador/base.html" %}
+
+{% block title %}Ver Mensaje - Recicla Comuna 4{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="flex justify-between items-start mb-6">
+        <h1 class="text-2xl font-bold">Mensaje</h1>
+        <div class="flex space-x-3">
+            <a href="{% url 'bandeja_entrada' %}" class="inline-block bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition">
+                Bandeja de Entrada
+            </a>
+            {% if mensaje.remitente == user %}
+                <a href="{% url 'bandeja_salida' %}" class="inline-block bg-gray-300 text-gray-800 px-4 py-2 rounded-lg hover:bg-gray-400 transition">
+                    Bandeja de Salida
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="mb-4 p-4 rounded-lg {% if message.tags == 'error' %}bg-red-100 border border-red-400{% elif message.tags == 'success' %}bg-green-100 border border-green-400{% elif message.tags == 'warning' %}bg-yellow-100 border border-yellow-400{% else %}bg-blue-100 border border-blue-400{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    
+    <div class="bg-white p-6 rounded-lg shadow-md mb-6">
+        <div class="flex items-start mb-4">
+            {% if mensaje.remitente.foto %}
+                <img src="{{ mensaje.remitente.foto.url }}" alt="{{ mensaje.remitente.nombre }}" class="w-16 h-16 rounded-full mr-4">
+            {% else %}
+                <div class="w-16 h-16 bg-gray-300 rounded-full flex items-center justify-center mr-4">
+                    <span class="text-gray-600 text-lg">{{ mensaje.remitente.nombre|first }}{{ mensaje.remitente.apellido|first }}</span>
+                </div>
+            {% endif %}
+            <div class="flex-1">
+                <div class="flex justify-between items-start mb-2">
+                    <h2 class="font-semibold">{{ mensaje.remitente.nombre }} {{ mensaje.remitente.apellido }}</h2>
+                    <span class="text-sm text-gray-500">{{ mensaje.fecha_envio|date:"d/m/y H:i" }}</span>
+                </div>
+                
+                {% if mensaje.jornada %}
+                    <div class="mb-2">
+                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">{{ jornada.titulo }}</span>
+                    </div>
+                {% endif %}
+                
+                <div class="flex items-center mb-2">
+                    <span class="text-xs {% if estado.leido %}text-green-600{% else %}text-red-600{% endif %} mr-3">
+                        {% if estado.leido %}Leído{% else %}No leído{% endif %}
+                    </span>
+                    {% if not estado.leido and mensaje.destinatario == user %}
+                        <span class="text-xs text-blue-600 cursor-pointer hover:text-blue-800" onclick="marcarLeido()">
+                            Marcar como leído
+                        </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="prose max-w-none">
+            <p>{{ mensaje.contenido|linebreaks }}</p>
+        </div>
+        
+        {% if mensaje.archivo %}
+            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                <p class="font-semibold mb-2">Archivo adjunto:</p>
+                <a href="{{ mensaje.archivo.url }}" class="block text-green-600 hover:text-green-800 underline" target="_blank">
+                    📎 {{ mensaje.archivo.name }}
+                </a>
+                <p class="text-xs text-gray-500 mt-1">Tamaño: {{ mensaje.archivo.size|filesizeformat }}</p>
+            </div>
+        {% endif %}
+        
+        {% if mensaje.editado %}
+            <p class="mt-4 text-xs text-gray-500 italic">
+                Última edición: {{ mensaje.fecha_edicion|date:"d/m/y H:i" }}
+            </p>
+        {% endif %}
+    </div>
+    
+    {% if mensaje.destinatario == user or mensaje.remitente == user %}
+        <div class="mt-6">
+            <h2 class="text-xl font-bold mb-4">Responder</h2>
+            <form method="POST" enctype="multipart/form-data" class="bg-white p-6 rounded-lg shadow-md">
+                {% csrf_token %}
+                
+                <input type="hidden" name="destinatario_id" value="{% if mensaje.destinatario == user %}{{ mensaje.remitente.id_usuario }}{% else %}{{ mensaje.destinatario.id_usuario }}{% endif %}">
+                <input type="hidden" name="jornada_id" value="{% if mensaje.jornada %}{{ mensaje.jornada.id_jornada }}{% endif %}">
+                
+                <div class="mb-4">
+                    <label for="respuesta_contenido" class="block text-gray-700 font-medium mb-2">Mensaje</label>
+                    <textarea id="respuesta_contenido" name="contenido" rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Escribe tu respuesta aquí..."></textarea>
+                </div>
+                
+                <div class="mb-4">
+                    <label for="respuesta_archivo" class="block text-gray-700 font-medium mb-2">Archivo adjunto (opcional, máximo 5 MB)</label>
+                    <input type="file" id="respuesta_archivo" name="archivo" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                </div>
+                
+                <div class="flex justify-end">
+                    <button type="submit" class="inline-block bg-green-500 text-white px-6 py-3 rounded-lg hover:bg-green-600 transition">
+                        Enviar Respuesta
+                    </button>
+                </div>
+            </form>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+function marcarLeido() {
+    fetch(`/mensajeria/marcar-leido/{{ mensaje.id_mensaje }}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}
