@@ -69,7 +69,10 @@ AUTH_PASSWORD_VALIDATORS = [
     {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-AUTHENTICATION_BACKENDS = ['core.backends.UsuariosBackend']
+AUTHENTICATION_BACKENDS = [
+    'core.backends.UsuariosBackend',
+    'core.auth.GoogleOAuthBackend',
+]
 
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
@@ -91,6 +94,11 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = "reciclacomuna@gmail.com"
 EMAIL_HOST_PASSWORD = "upmiclxujxbruvke"
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+# Google OAuth Configuration
+GOOGLE_OAUTH_CLIENT_ID = ''
+GOOGLE_OAUTH_CLIENT_SECRET = ''
+GOOGLE_OAUTH_REDIRECT_URI = 'http://localhost:8000/google/callback/'
 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/residente/inicio/'
