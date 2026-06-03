@@ -9,7 +9,9 @@ urlpatterns = [
     path("login/", views.login_view, name="login"),
     path("register/", views.register_view, name="register"),
     path("logout/", views.logout_view, name="logout"),
-
+    path("google/login/", views.google_login, name="google_login"),
+    path("google/callback/", views.google_callback, name="google_callback"),
+    
     # PANEL PRINCIPAL POR ROL
     path("panel/admin/", views.admin_panel, name="admin_panel"),
     path("panel/residente/", views.residente_panel, name="residente_panel"),
