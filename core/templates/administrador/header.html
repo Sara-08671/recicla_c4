@@ -85,4 +85,56 @@
       <a href="{% url 'logout' %}">Cerrar sesión</a>
     </aside>
 
+    <script>
+    // Dark Mode functionality
+    document.addEventListener('DOMContentLoaded', () => {
+      const darkModeToggle = document.getElementById('darkModeToggle');
+      const rootElement = document.documentElement; // <html> element
+
+      // Check for saved user preference, if any, on load
+      const savedMode = localStorage.getItem('darkMode');
+      if (savedMode === 'enabled') {
+        rootElement.classList.add('dark-mode');
+        if (darkModeToggle) darkModeToggle.checked = true;
+      }
+
+      // If the toggle exists (only on config page), add change listener
+      if (darkModeToggle) {
+        darkModeToggle.addEventListener('change', () => {
+          if (darkModeToggle.checked) {
+            rootElement.classList.add('dark-mode');
+            localStorage.setItem('darkMode', 'enabled');
+          } else {
+            rootElement.classList.remove('dark-mode');
+            localStorage.setItem('darkMode', 'disabled');
+          }
+        });
+      }
+      
+      // Funcionalidad para el badge de mensajes no leídos
+      function actualizarBadgeMensajes() {
+        fetch("{% url 'contar_mensajes_no_leidos' %}")
+          .then(response => response.json())
+          .then(data => {
+            const badge = document.getElementById('mensaje-badge');
+            if (badge) {
+              if (data.count > 0) {
+                badge.textContent = data.count;
+                badge.style.display = 'inline-block';
+              } else {
+                badge.style.display = 'none';
+              }
+            }
+          })
+          .catch(error => {
+            console.error('Error al obtener el conteo de mensajes:', error);
+          });
+      }
+      
+      // Actualizar el badge al cargar la página y luego cada 30 segundos
+      actualizarBadgeMensajes();
+      setInterval(actualizarBadgeMensajes, 30000);
+    });
+    </script>
+
 {% endblock %}

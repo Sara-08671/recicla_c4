@@ -261,3 +261,24 @@ footer {
   transition: color 0.2s;
 }
 .social-links a:hover { color: var(--primary); }
+
+/* Badge de notificaciones para mensajes */
+.notification-badge {
+  display: inline-block;
+  background-color: var(--primary);
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 12px;
+  font-weight: bold;
+  margin-left: 8px;
+  vertical-align: middle;
+  min-width: 18px;
+  text-align: center;
+  line-height: 18px;
+}
+
+/* Estilos para modo oscuro */
+.dark-mode .notification-badge {
+  background-color: var(--primary);
+}

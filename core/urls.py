@@ -23,6 +23,7 @@ urlpatterns = [
     path("mensajeria/privacidad/", views.configurar_privacidad, name="configurar_privacidad"),
     path("mensajeria/verificar-conexion/", views.verificar_ultima_conexion, name="verificar_ultima_conexion"),
     path("mensajeria/contar-no-leidos/", views.contar_mensajes_no_leidos, name="contar_mensajes_no_leidos"),
+    path("mensajeria/marcar-leido/<int:mensaje_id>/", views.marcar_mensaje_leido, name="marcar_mensaje_leido"),
     
     # PANEL PRINCIPAL POR ROL
     path("panel/admin/", views.admin_panel, name="admin_panel"),

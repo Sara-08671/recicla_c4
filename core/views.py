@@ -542,20 +542,20 @@ def verify_email(request, token):
         messages.info(request, "Tu cuenta ya estaba verificada. Ya puedes iniciar sesión.")
         return redirect("login")
 
-     usuario.verificado = True
-     usuario.fecha_verificacion = timezone.now()
-     usuario.token_verificacion = None
+    usuario.verificado = True
+    usuario.fecha_verificacion = timezone.now()
+    usuario.token_verificacion = None
 
-     if usuario.rol == "residente":
-         usuario.estado = "activo"
+    if usuario.rol == "residente":
+        usuario.estado = "activo"
 
-     usuario.save()
+    usuario.save()
 
-     if usuario.rol == "residente":
-         messages.success(request, "✅ ¡Cuenta verificada correctamente! Ya puedes iniciar sesión.")
-     else:
-         messages.success(request, "✅ ¡Cuenta verificada! Espera a que un administrador apruebe tu solicitud.")
-     return redirect("login")
+    if usuario.rol == "residente":
+        messages.success(request, "✅ ¡Cuenta verificada correctamente! Ya puedes iniciar sesión.")
+    else:
+        messages.success(request, "✅ ¡Cuenta verificada! Espera a que un administrador apruebe tu solicitud.")
+    return redirect("login")
 
 
 # GOOGLE OAUTH
@@ -700,7 +700,7 @@ def google_callback(request):
             elif usuario.estado == 'rechazado':
                 messages.error(request, "Tu solicitud fue rechazada.")
             return redirect('login')
-        
+         
         # Iniciar sesión
         request.session["usuario_id"] = usuario.id_usuario
         request.session["usuario_nombre"] = usuario.nombre
@@ -713,13 +713,13 @@ def google_callback(request):
             return redirect("organizador_inicio")
         else:
             return redirect("residente_inicio")
-            
+        
     except requests.exceptions.RequestException as e:
         messages.error(request, f"Error de comunicación con Google: {str(e)}")
         return redirect('login')
-     except Exception as e:
-         messages.error(request, f"Error durante la autenticación: {str(e)}")
-         return redirect('login')
+    except Exception as e:
+        messages.error(request, f"Error durante la autenticación: {str(e)}")
+        return redirect('login')
 
 
 # SOLICITUD DE CAMBIO DE ROL
@@ -2759,9 +2759,10 @@ def enviar_mensaje(request):
             # Si no se especifica jornada, buscar una jornada activa común
             jornadas_comunes = Jornada.objects.filter(
                 inscripcion__usuario=remitente,
+                inscripcion__estado='activa'
+            ).filter(
                 inscripcion__usuario=destinatario,
-                inscripcion__estado='activa',
-                estado__in=['activa', 'en_curso']
+                inscripcion__estado='activa'
             ).distinct()
             
             if not jornadas_comunes.exists():
@@ -3007,9 +3008,10 @@ def verificar_ultima_conexion(request):
         
         jornadas_comunes = Jornada.objects.filter(
             inscripcion__usuario=usuario_actual,
+            inscripcion__estado__in=['activa', 'en_curso']
+        ).filter(
             inscripcion__usuario=usuario,
-            inscripcion__estado='activa',
-            estado__in=['activa', 'en_curso']
+            inscripcion__estado__in=['activa', 'en_curso']
         ).exists()
         
         if not jornadas_comunes:
@@ -3069,3 +3071,46 @@ def contar_mensajes_no_leidos(request):
         return JsonResponse({'count': count})
     except Usuario.DoesNotExist:
         return JsonResponse({'count': 0})
+
+
+def marcar_mensaje_leido(request, mensaje_id):
+    """
+    Vista AJAX para marcar un mensaje como leído
+    """
+    if not request.session.get("usuario_id"):
+        return JsonResponse({'success': False, 'error': 'No autenticado'})
+    
+    if request.method != "POST":
+        return JsonResponse({'success': False, 'error': 'Método no permitido'})
+    
+    try:
+        mensaje = Mensaje.objects.get(id_mensaje=mensaje_id)
+        usuario = Usuario.objects.get(id_usuario=request.session["usuario_id"])
+        
+        # Verificar que el usuario sea el destinatario
+        if mensaje.destinatario != usuario:
+            return JsonResponse({'success': False, 'error': 'No tienes permiso para este mensaje'})
+        
+        estado, created = EstadoMensaje.objects.get_or_create(
+            mensaje=mensaje,
+            usuario=usuario
+        )
+        
+        if not estado.leido:
+            estado.leido = True
+            estado.fecha_lectura = timezone.now()
+            # Agregar al historial de cambios
+            historial = list(estado.historial_cambios) if estado.historial_cambios else []
+            historial.append({
+                'fecha': timezone.now().isoformat(),
+                'cambio': 'no_leido -> leido',
+                'motivo': 'accion_usuario'
+            })
+            estado.historial_cambios = historial
+            estado.save()
+        
+        return JsonResponse({'success': True})
+    except Mensaje.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Mensaje no encontrado'})
+    except Usuario.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Usuario no encontrado'})
