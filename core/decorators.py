@@ -19,18 +19,23 @@ def rol_required(roles):
             if not usuario_id:
                 return render(request, "errores/no_sesion.html")
 
-            # 2) Comprobar rol en sesión primero (más rápido)
-            if session_role:
-                if session_role.strip().lower() in roles:
-                    return view_func(request, *args, **kwargs)
-                # si sesión dice otro rol, igual consultamos DB por seguridad y para depurar
-
-            # 3) Consultar BD y verificar rol (normalizando)
+            # 2) Obtener usuario y verificar excepción correo recicla
             try:
                 usuario = Usuario.objects.get(id_usuario=usuario_id)
             except Usuario.DoesNotExist:
                 return render(request, "errores/no_sesion.html")
 
+            # Permitir acceso admin con correo recicla sin importar el rol
+            if usuario.correo == "reciclacomuna@gmail.com":
+                request.session['usuario_rol'] = 'administrador'
+                return view_func(request, *args, **kwargs)
+
+            # 3) Comprobar rol en sesión primero (más rápido)
+            if session_role:
+                if session_role.strip().lower() in roles:
+                    return view_func(request, *args, **kwargs)
+
+            # 4) Consultar BD y verificar rol (normalizando)
             db_role = (usuario.rol or "").strip().lower()
             if db_role in roles:
                 # Sincronizar sesión con la info correcta por si acaso

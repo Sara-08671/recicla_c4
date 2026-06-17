@@ -66,31 +66,33 @@ def login_view(request):
 
             # Verificar si está bloqueado
             if usuario.bloqueado_hasta and timezone.now() < usuario.bloqueado_hasta:
-                remaining = (usuario.bloqueado_hasta - timezone.now()).total_seconds() // 3600
-                messages.error(request, f"Cuenta bloqueada por intentos fallidos. Intente de nuevo en {int(remaining)} horas.")
+                remaining = (usuario.bloqueado_hasta - timezone.now()).total_seconds() // 60
+                messages.error(request, f"Cuenta bloqueada por intentos fallidos. Intente de nuevo en {int(remaining)} minutos.")
                 return redirect("login")
 
             # validar la contraseña encriptada
             if not check_password(contrasena, usuario.contrasena):
                 usuario.intentos_fallidos += 1
                 if usuario.intentos_fallidos >= 5:
-                    usuario.bloqueado_hasta = timezone.now() + timedelta(hours=24)
+                    usuario.bloqueado_hasta = timezone.now() + timedelta(minutes=30)
                 usuario.save()
 
                 intentos_restantes = 5 - usuario.intentos_fallidos
                 if intentos_restantes > 0:
                     messages.error(request, f"Correo o contraseña incorrectos. Te quedan {intentos_restantes} intentos.")
                 else:
-                    messages.error(request, "Has alcanzado el máximo de intentos. Cuenta bloqueada por 24 horas.")
+                    messages.error(request, "Has alcanzado el máximo de intentos. Cuenta bloqueada por 30 minutos.")
                 return redirect("login")
 
             # Verificar que la cuenta esté verificada
-            if not usuario.verificado:
+            # Permitir acceso admin con correo recicla sin verificación
+            if not usuario.verificado and correo != "reciclacomuna@gmail.com":
                 messages.error(request, "Debes verificar tu correo antes de iniciar sesión. Revisa tu bandeja de entrada.")
                 return redirect("login")
 
             # Verificar estado (pendiente, rechazado, etc.)
-            if not usuario.puede_acceder():
+            # Permitir acceso admin con correo recicla sin aprobación
+            if not usuario.puede_acceder() and correo != "reciclacomuna@gmail.com":
                 if usuario.estado == 'pendiente':
                     messages.error(request, "Tu cuenta está pendiente de aprobación.")
                 elif usuario.estado == 'rechazado':
@@ -107,7 +109,11 @@ def login_view(request):
             return redirect("login")
 
         # Normalizar rol y guardar sesión
-        rol_normalizado = (usuario.rol or "").strip().lower()
+        # Permitir acceso admin con correo recicla sin importar su rol en BD
+        if correo == "reciclacomuna@gmail.com":
+            rol_normalizado = "administrador"
+        else:
+            rol_normalizado = (usuario.rol or "").strip().lower()
 
         request.session["usuario_id"] = usuario.id_usuario
         request.session["usuario_nombre"] = usuario.nombre
@@ -695,23 +701,30 @@ def google_callback(request):
                     fail_silently=False,
                 )
         
-        # Verificar que el usuario pueda acceder
-        if not usuario.puede_acceder():
+# Verificar que el usuario pueda acceder
+        # Permitir acceso admin con correo recicla sin aprobación
+        if not usuario.puede_acceder() and email != "reciclacomuna@gmail.com":
             if usuario.estado == 'pendiente':
                 messages.warning(request, "Tu cuenta está pendiente de aprobación por un administrador.")
             elif usuario.estado == 'rechazado':
                 messages.error(request, "Tu solicitud fue rechazada.")
             return redirect('login')
-         
+          
         # Iniciar sesión
+        # Permitir acceso admin con correo recicla sin importar su rol en BD
+        if email == "reciclacomuna@gmail.com":
+            rol_sesion = "administrador"
+        else:
+            rol_sesion = usuario.rol
+
         request.session["usuario_id"] = usuario.id_usuario
         request.session["usuario_nombre"] = usuario.nombre
-        request.session["usuario_rol"] = usuario.rol
+        request.session["usuario_rol"] = rol_sesion
         
         # Redirección por rol
-        if usuario.rol == "administrador":
+        if rol_sesion == "administrador":
             return redirect("admi_inicio")
-        elif usuario.rol == "organizador":
+        elif rol_sesion == "organizador":
             return redirect("organizador_inicio")
         else:
             return redirect("residente_inicio")
@@ -917,8 +930,10 @@ def admin_users_create(request):
         return redirect("admi_inicio")
 
     if request.method == "POST":
-        form = UsuarioForm(request.POST)
+        form = UsuarioForm(request.POST, request.FILES)
         if form.is_valid():
+            nuevo = form.save(commit=False)
+            pwd = form.cleaned_data.get("password_plain")
             if pwd:
                 nuevo.contrasena = make_password(pwd)
             else:
