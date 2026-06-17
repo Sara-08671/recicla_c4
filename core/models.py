@@ -434,3 +434,12 @@ class PrivacidadUsuario(models.Model):
     def __str__(self):
         return f"Privacidad de {self.usuario}"
 
+class SolicitudRol(models.Model):
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    rol_solicitado = models.CharField(max_length=20)
+    justificacion = models.TextField()
+    estado = models.CharField(
+        max_length=20,
+        default="pendiente"
+    )
+    fecha = models.DateTimeField(auto_now_add=True)

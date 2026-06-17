@@ -1,7 +1,9 @@
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import Usuario
+
+from django.conf import settings
+from .models import EstadoMensaje, Mensaje, Usuario
 from .forms import JornadaForm
 from django.shortcuts import get_object_or_404, render
 from .models import Jornada, Inscripcion, Asistencia, Puntaje, AccionDestacada, Recordatorio
@@ -3114,3 +3116,15 @@ def marcar_mensaje_leido(request, mensaje_id):
         return JsonResponse({'success': False, 'error': 'Mensaje no encontrado'})
     except Usuario.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Usuario no encontrado'})
+    
+
+def prueba_correo(request):
+    send_mail(
+        "Prueba ReciclaC4",
+        "Si recibes este correo, SMTP funciona correctamente.",
+        settings.EMAIL_HOST_USER,
+        ["reciclacomuna@gmail.com"],
+        fail_silently=False,
+    )
+
+    return HttpResponse("Correo enviado")

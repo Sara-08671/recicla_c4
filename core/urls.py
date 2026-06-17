@@ -120,4 +120,7 @@ path('residente/configuracion/', views.residente_configuracion, name='residente_
     path('foro/reaccionar/<int:tema_id>/', views.foro_reaccionar, name='foro_reaccionar'),
     path('foro/comentar/<int:tema_id>/', views.foro_comentar, name='foro_comentar'),
     path('foro/denunciar/<int:tema_id>/', views.foro_denunciar, name='foro_denunciar'),
+
+
+    path('prueba-correo/', views.prueba_correo),
 ]
